@@ -1,0 +1,175 @@
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  WORKER
+  ADMIN
+}
+
+enum ServiceType {
+  PLUMBER
+  ELECTRICIAN
+  AC_TECHNICIAN
+  CARPENTER
+}
+
+enum RequestStatus {
+  PENDING
+  SEARCHING
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  PRICE_SET
+  AWAITING_APPROVAL
+  PAYMENT_PENDING
+  PAID
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum ChatState {
+  INIT
+  ISSUE_CAPTURED
+  NEED_LOCATION
+  SEARCHING
+  ASSIGNED
+  AWAITING_PRICE
+  PAYMENT_PENDING
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  CREATED
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  password     String
+  role         Role      @default(USER)
+  latitude     Float?
+  longitude    Float?
+  address      String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  chatSessions ChatSession[]
+  requests     ServiceRequest[] @relation("UserRequests")
+  ratingsGiven Rating[]         @relation("RatingsGiven")
+
+  workerProfile WorkerProfile?
+}
+
+model WorkerProfile {
+  id           String      @id @default(uuid())
+  userId       String      @unique
+  user         User        @relation(fields: [userId], references: [id])
+  serviceType  ServiceType
+  isAvailable  Boolean     @default(true)
+  latitude     Float?
+  longitude    Float?
+  address      String?
+  rating       Float       @default(0)
+  totalJobs    Int         @default(0)
+  bio          String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  requests     ServiceRequest[] @relation("WorkerRequests")
+  ratingsReceived Rating[]      @relation("RatingsReceived")
+}
+
+model ChatSession {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  state       ChatState @default(INIT)
+  context     Json      @default("{}")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  messages    ChatMessage[]
+  request     ServiceRequest?
+}
+
+model ChatMessage {
+  id            String      @id @default(uuid())
+  sessionId     String
+  session       ChatSession @relation(fields: [sessionId], references: [id])
+  role          String      // 'user' | 'bot'
+  content       String
+  metadata      Json?
+  createdAt     DateTime    @default(now())
+}
+
+model ServiceRequest {
+  id             String        @id @default(uuid())
+  sessionId      String?       @unique
+  session        ChatSession?  @relation(fields: [sessionId], references: [id])
+  userId         String
+  user           User          @relation("UserRequests", fields: [userId], references: [id])
+  workerId       String?
+  worker         WorkerProfile? @relation("WorkerRequests", fields: [workerId], references: [id])
+  serviceType    ServiceType
+  description    String
+  status         RequestStatus @default(PENDING)
+  userLatitude   Float?
+  userLongitude  Float?
+  userAddress    String?
+  proposedPrice  Float?
+  finalPrice     Float?
+  userApproved   Boolean       @default(false)
+  workerNotes    String?
+  scheduledAt    DateTime?
+  acceptedAt     DateTime?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  payment        Payment?
+  rating         Rating?
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  requestId       String        @unique
+  request         ServiceRequest @relation(fields: [requestId], references: [id])
+  razorpayOrderId String?       @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amount          Float
+  currency        String        @default("INR")
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Rating {
+  id         String        @id @default(uuid())
+  requestId  String        @unique
+  request    ServiceRequest @relation(fields: [requestId], references: [id])
+  raterId    String
+  rater      User          @relation("RatingsGiven", fields: [raterId], references: [id])
+  workerId   String
+  worker     WorkerProfile @relation("RatingsReceived", fields: [workerId], references: [id])
+  score      Int           // 1-5
+  comment    String?
+  createdAt  DateTime      @default(now())
+}

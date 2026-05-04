@@ -1,0 +1,15 @@
+{
+  "name": "homefix",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "db:push": "cd backend && npx prisma db push",
+    "db:generate": "cd backend && npx prisma generate",
+    "db:seed": "cd backend && node src/prisma/seed.js",
+    "db:studio": "cd backend && npx prisma studio",
+    "setup": "npm run install:all && npm run db:generate && npm run db:push && npm run db:seed"
+  }
+}
