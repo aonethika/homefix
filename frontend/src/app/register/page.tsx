@@ -1,147 +1,35 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { bookingReturn } from '@/services/booking-return';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { register, clearError } from '@/store/authSlice';
-import { RootState, AppDispatch } from '@/store';
-
-const SERVICE_TYPES = ['PLUMBER', 'ELECTRICIAN', 'AC_TECHNICIAN', 'CARPENTER'];
+import { ArrowRight, CheckCircle2, Wrench } from 'lucide-react';
+import Brand from '@/components/Brand';
+import LocationPicker, { PickedLocation } from '@/components/LocationPicker';
+import { clearError, register } from '@/store/authSlice';
+import type { AppDispatch, RootState } from '@/store';
 
 export default function RegisterPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { loading, error, user } = useSelector((s: RootState) => s.auth);
-
-  const [form, setForm] = useState({
-    name: '', email: '', password: '', phone: '',
-    role: 'USER', serviceType: 'PLUMBER',
-    address: '', latitude: '', longitude: '',
-  });
-  const [step, setStep] = useState(1);
-
-  useEffect(() => {
-    if (user) router.replace(user.role === 'WORKER' ? '/worker' : '/chat');
-  }, [user, router]);
-
-  useEffect(() => { dispatch(clearError()); }, []);
-
-  const set = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload: any = {
-      name: form.name, email: form.email, password: form.password,
-      phone: form.phone, role: form.role, address: form.address,
-    };
-    if (form.latitude) payload.latitude = parseFloat(form.latitude);
-    if (form.longitude) payload.longitude = parseFloat(form.longitude);
-    if (form.role === 'WORKER') payload.serviceType = form.serviceType;
-    await dispatch(register(payload));
+  const [next, setNext] = useState('/chat');
+  useEffect(() => { setNext(bookingReturn()); }, []);
+  const { loading, error, user } = useSelector((state: RootState) => state.auth);
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', location: {} as Partial<PickedLocation> });
+  useEffect(() => { dispatch(clearError()); }, [dispatch]);
+  useEffect(() => { if (user) router.replace(user.role === 'WORKER' ? '/worker' : bookingReturn()); }, [router, user]);
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    await dispatch(register({ name: form.name, email: form.email, password: form.password, phone: form.phone || undefined, address: form.location.address, latitude: form.location.latitude, longitude: form.location.longitude }));
   };
-
-  const getLocation = () => {
-    navigator.geolocation?.getCurrentPosition(pos => {
-      set('latitude', pos.coords.latitude.toString());
-      set('longitude', pos.coords.longitude.toString());
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-xl shadow-lg shadow-orange-500/30">🏠</div>
-            <span className="font-display font-bold text-xl text-white">HomeFix</span>
-          </Link>
-          <h1 className="text-2xl font-display font-bold text-white">Create account</h1>
-          <p className="text-sm text-[#a8a29e] mt-1">Join HomeFix today</p>
-        </div>
-
-        {/* Role toggle */}
-        <div className="flex bg-[#18181b] border border-[#2a2a30] rounded-xl p-1 mb-6">
-          {['USER', 'WORKER'].map(r => (
-            <button key={r} onClick={() => set('role', r)}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${form.role === r ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25' : 'text-[#a8a29e] hover:text-white'}`}>
-              {r === 'USER' ? '👤 Homeowner' : '🔧 Professional'}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Full Name</label>
-              <input required value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Email</label>
-              <input required type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="you@example.com"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Password</label>
-              <input required type="password" value={form.password} onChange={e => set('password', e.target.value)} placeholder="Min 8 characters"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Phone (optional)</label>
-              <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+91 98765 43210"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-
-            {form.role === 'WORKER' && (
-              <div className="col-span-2">
-                <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Service Type</label>
-                <select value={form.serviceType} onChange={e => set('serviceType', e.target.value)}
-                  className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors">
-                  {SERVICE_TYPES.map(t => (
-                    <option key={t} value={t}>{t.replace('_', ' ')}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Address (optional)</label>
-              <input value={form.address} onChange={e => set('address', e.target.value)} placeholder="Your area / city"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Latitude</label>
-              <input value={form.latitude} onChange={e => set('latitude', e.target.value)} placeholder="11.258"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-3 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-[#a8a29e] mb-1.5">Longitude</label>
-              <input value={form.longitude} onChange={e => set('longitude', e.target.value)} placeholder="75.780"
-                className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-orange-500/50 rounded-xl px-3 py-2.5 text-sm text-white placeholder-[#57534e] focus:outline-none transition-colors" />
-            </div>
-
-            <button type="button" onClick={getLocation}
-              className="col-span-2 py-2 text-xs text-orange-400 border border-orange-500/20 hover:bg-orange-500/10 rounded-xl transition-colors font-medium">
-              📍 Use My Current Location
-            </button>
-          </div>
-
-          {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs">{error}</div>
-          )}
-
-          <button type="submit" disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2">
-            {loading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Creating...</span></> : 'Create Account'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-[#57534e] mt-6">
-          Already have an account?{' '}
-          <Link href="/login" className="text-orange-400 hover:text-orange-300 font-medium transition-colors">Sign in</Link>
-        </p>
-      </div>
-    </div>
-  );
+  return <main className="hf-page flex min-h-screen items-center justify-center px-4 py-10 sm:px-6"><div className="grid w-full max-w-5xl overflow-hidden rounded-[2rem] hf-panel lg:grid-cols-[.85fr_1.15fr]">
+    <aside className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-700 to-teal-600 p-8 text-white sm:p-10"><div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-300/30 blur-3xl" /><Brand tone="light" /><div className="relative mt-20"><p className="text-xs font-bold uppercase tracking-[.2em] text-blue-100">Homeowner account</p><h1 className="mt-4 font-display text-4xl font-bold leading-tight tracking-[-.05em]">A faster way to get your home fixed.</h1><div className="mt-8 space-y-4 text-sm text-blue-50/85">{['Chat naturally about the problem','Get matched with an approved professional','Track every update and pay securely'].map(item => <p key={item} className="flex items-center gap-3"><CheckCircle2 size={18} className="text-amber-300" />{item}</p>)}</div></div><Link href="/professional-register" className="relative mt-16 flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 p-4 text-sm font-semibold backdrop-blur transition hover:bg-white/15"><Wrench size={19} /><span className="flex-1">Are you a professional?<small className="mt-0.5 block font-normal text-white/65">Apply to join our network</small></span><ArrowRight size={17} /></Link></aside>
+    <section className="p-6 sm:p-10 lg:p-12"><p className="text-xs font-bold uppercase tracking-[.18em] text-teal-600">Create your account</p><h2 className="mt-3 font-display text-3xl font-bold tracking-[-.04em] text-[var(--text)]">Let’s get you set up.</h2><p className="mt-2 text-sm text-[var(--muted)]">Required fields are kept short. You can update details later.</p><form onSubmit={submit} className="mt-8 space-y-5">
+      <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-[var(--text)]">Full name<input required autoComplete="name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="hf-input mt-2" placeholder="Your name" /></label><label className="text-sm font-semibold text-[var(--text)]">Phone number<input autoComplete="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className="hf-input mt-2" placeholder="+91 98765 43210" /></label></div>
+      <label className="block text-sm font-semibold text-[var(--text)]">Email address<input required type="email" autoComplete="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="hf-input mt-2" placeholder="you@example.com" /></label><label className="block text-sm font-semibold text-[var(--text)]">Password<input required minLength={8} type="password" autoComplete="new-password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="hf-input mt-2" placeholder="At least 8 characters" /></label>
+      <LocationPicker value={form.location} onChange={location => setForm({ ...form, location })} />{error && <div role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}<button disabled={loading} className="hf-primary flex w-full items-center justify-center gap-2 px-5 py-3.5 disabled:opacity-60">{loading ? 'Creating account…' : 'Create homeowner account'}{!loading && <ArrowRight size={17} />}</button>
+    </form><p className="mt-6 text-center text-sm text-[var(--muted)]">Already registered? <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-bold text-blue-600">Sign in</Link></p></section>
+  </div></main>;
 }

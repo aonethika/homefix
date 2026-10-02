@@ -1,0 +1,30 @@
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, CalendarDays, MessageCircle } from 'lucide-react';
+import { useWorkerWorkspace } from '@/components/worker/WorkerWorkspace';
+import StatusBadge from '@/components/StatusBadge';
+import RequestConversation from '@/components/RequestConversation';
+import RequestTracker from '@/components/RequestTracker';
+import CancelRequestButton from '@/components/CancelRequestButton';
+import StartWorkButton from '@/components/StartWorkButton';
+import SafetyShortcuts from '@/components/SafetyShortcuts';
+import { workerAPI, getApiError } from '@/services/api';
+import { formatCurrency, SERVICE_LABELS } from '@/utils/formatTime';
+export default function WorkerJobPage({ params }: { params: { id: string } }) {
+  const { user, requests, loading, refresh, position, locationError } = useWorkerWorkspace();
+  const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [price, setPrice] = useState('');
+  const request = requests.find(r => r.id === params.id);
+  const act = async (action: () => Promise<any>) => { if (busy) return; setBusy(true); setError(''); try { await action(); await refresh(); } catch (error) { setError(getApiError(error, 'Could not update this job.')); await refresh(); } finally { setBusy(false); } };
+  if (!request) return <div className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-8"><p role="status" className="text-sm text-[var(--muted)]">{loading ? 'Loading job...' : 'This job is no longer available in your workspace.'}</p><Link href="/worker/requests" className="mt-4 inline-block text-sm text-[var(--brand)]">Back to requests</Link></div>;
+  const assigned = request.workerId === user.workerProfile?.id;
+  const active = ['ACCEPTED', 'IN_PROGRESS'].includes(request.status);
+  return <><Link href="/worker/jobs" className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--muted)]"><ArrowLeft size={16} />Back to jobs</Link><header className="mb-6 flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-semibold text-[var(--brand)]">{SERVICE_LABELS[request.serviceKey || request.serviceType] || 'Home service'}</p><h1 className="mt-1 text-2xl font-bold">{request.user?.name || 'Homeowner'}</h1>{request.scheduledAt && <p className="mt-2 flex items-center gap-2 text-sm text-[var(--muted)]"><CalendarDays size={16} />{new Date(request.scheduledAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</p>}</div><StatusBadge status={request.status} /></header>
+    {error && <p role="alert" className="mb-4 text-sm text-[var(--danger)]">{error}</p>}
+    <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(300px,.9fr)]"><section className="min-w-0 space-y-5"><div className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"><h2 className="font-semibold">The issue</h2><p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-[var(--muted)]">{request.description}</p><div className="mt-5 flex flex-wrap gap-2">{['SEARCHING', 'ASSIGNED'].includes(request.status) && <><button disabled={busy} onClick={() => act(() => workerAPI.acceptRequest(request.id))} className="min-h-11 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white disabled:opacity-50">Accept request</button><button disabled={busy} onClick={() => act(() => workerAPI.rejectRequest(request.id))} className="min-h-11 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold disabled:opacity-50">Decline</button></>}<StartWorkButton request={request} onStarted={refresh} />{assigned && <CancelRequestButton request={request} onCancelled={refresh} onChanged={refresh} />}{request.status === 'IN_PROGRESS' && <button disabled={busy} onClick={() => act(() => workerAPI.updateStatus(request.id, 'COMPLETED'))} className="min-h-11 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white">Mark work complete</button>}</div>{request.status === 'ACCEPTED' && <p className="mt-3 text-xs leading-5 text-[var(--muted)]">Travel to the customer, then choose Start work when you arrive. Either person can cancel before work starts.</p>}</div>
+      {(request.bookingStage || request.scheduledAt) ? <Link href={`/bookings/${request.id}`} className="flex min-h-14 items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5 text-sm font-semibold text-[var(--brand)]"><MessageCircle size={19} />Open appointment conversation</Link> : !['CANCELLED', 'REJECTED', 'PAID'].includes(request.status) && <RequestConversation request={request} onSent={refresh} />}
+      {['COMPLETED', 'AWAITING_APPROVAL'].includes(request.status) && <form onSubmit={e => { e.preventDefault(); act(() => workerAPI.setPrice(request.id, Number(price))); }} className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"><h2 className="font-semibold">Job price</h2>{request.proposedPrice != null && <p className="text-sm text-[var(--muted)]">Proposed: {formatCurrency(request.proposedPrice)}</p>}{request.counterPrice != null && <p className="text-sm">Customer counter-offer: {formatCurrency(request.counterPrice)}</p>}<label className="block text-sm font-semibold">{request.proposedPrice ? 'Revised price' : 'Final price'}<input required type="number" min="1" max="1000000" step="0.01" value={price} onChange={e => setPrice(e.target.value)} placeholder="Amount in INR" className="hf-input mt-2" /></label><button disabled={busy} className="min-h-11 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white disabled:opacity-50">Send price for approval</button></form>}
+      {request.finalPrice != null && <p className="text-sm font-semibold">Job total: {formatCurrency(request.finalPrice)}</p>}
+    </section><aside className="min-w-0 space-y-4">{active && <RequestTracker request={request} position={position} professional locationError={locationError} />}{assigned && !['CANCELLED', 'REJECTED', 'PAID'].includes(request.status) && <SafetyShortcuts />}</aside></div>
+  </>;
+}

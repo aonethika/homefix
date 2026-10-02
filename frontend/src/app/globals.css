@@ -1,213 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ============================= */
-/* ROOT DESIGN SYSTEM */
-/* ============================= */
+:root { --danger:#be123c; --success:#047857; --warning:#a16207; --surface:#f7fafc; --surface-card:#ffffff; --surface-raised:#eef4f8; --surface-border:#dbe6ee; --text-primary:#10233f; --text-secondary:#52657a; --text-muted:#718196; --brand:#2563eb; --brand-dark:#1d4ed8; --page:#f7fafc; --panel:#ffffff; --soft:#eef4f8; --border:#dbe6ee; --text:#10233f; --muted:#64748b; color-scheme:light; }
+html[data-theme='dark'] { --danger:#fda4af; --success:#6ee7b7; --warning:#fde68a; --surface:#07111f; --surface-card:#0d1b2d; --surface-raised:#14263c; --surface-border:#243a54; --text-primary:#f7fbff; --text-secondary:#b6c4d5; --text-muted:#8495aa; --brand:#60a5fa; --brand-dark:#3b82f6; --page:#07111f; --panel:#0d1b2d; --soft:#14263c; --border:#243a54; --text:#f7fbff; --muted:#9aabbd; color-scheme:dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin:0; background:var(--surface); color:var(--text-primary); font-family:"Trebuchet MS","Segoe UI",sans-serif; overflow-x:hidden; }
+button,input,textarea,select { font:inherit; }
+button,a { -webkit-tap-highlight-color:transparent; }
+h1,h2,h3,h4,h5,h6,.font-display { font-family:"Segoe UI Semibold","Trebuchet MS",sans-serif; }
+::selection { background:rgba(37,99,235,.28); color:white; }
+*:focus-visible { outline:2px solid var(--brand); outline-offset:3px; }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:999px; }
+.app-shell { min-height:100vh; color:var(--text); background:radial-gradient(circle at 15% 0%,rgba(37,99,235,.30),transparent 30rem),radial-gradient(circle at 90% 28%,rgba(20,184,166,.16),transparent 26rem),var(--page); }
+.glass { background:color-mix(in srgb,var(--panel) 85%,transparent); border:1px solid var(--surface-border); backdrop-filter:blur(18px); }
+.card { background:var(--panel); border:1px solid var(--surface-border); box-shadow:0 22px 60px rgba(0,0,0,.18); }
+.eyebrow { letter-spacing:.16em; text-transform:uppercase; font-size:.7rem; font-weight:700; color:var(--brand); }
+.text-balance { text-wrap:balance; }
+.chat-scroll { scrollbar-gutter:stable; }
+.prose-chat strong { color:var(--brand); font-weight:650; }
+.prose-chat em { color:var(--text-secondary); }
+.prose-chat code { background:var(--soft); padding:2px 6px; border-radius:5px; }
+@keyframes shimmer { to { background-position-x:-200%; } }
+.shimmer { background:linear-gradient(110deg,var(--soft) 8%,var(--panel) 18%,var(--soft) 33%); background-size:200% 100%; animation:shimmer 1.35s linear infinite; }
+@keyframes float { 50% { transform:translateY(-8px); } }
+.float-slow { animation:float 5s ease-in-out infinite; }
+.hf-page { min-height:100vh; background:radial-gradient(circle at 5% 0%,rgba(37,99,235,.14),transparent 28rem),radial-gradient(circle at 95% 90%,rgba(20,184,166,.12),transparent 26rem),var(--page); color:var(--text); }
+.hf-panel { background:color-mix(in srgb,var(--panel) 92%,transparent); border:1px solid var(--border); box-shadow:0 24px 70px rgba(30,41,59,.10); }
+.hf-input { width:100%; height:3rem; border-radius:1rem; border:1px solid var(--border); background:var(--panel); padding:.75rem 1rem; color:var(--text); outline:none; transition:.2s; }
+.hf-input:focus { border-color:#60a5fa; box-shadow:0 0 0 4px rgba(96,165,250,.18); }
+.hf-input::placeholder { color:var(--muted); }
+.hf-primary { border-radius:1rem; background:linear-gradient(135deg,#2563eb,#0d9488); color:white; font-weight:750; box-shadow:0 12px 32px rgba(37,99,235,.24); transition:.2s; }
+.hf-primary:hover { transform:translateY(-1px); filter:saturate(1.1) brightness(1.03); }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
 
-:root {
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+/* Outgoing messages sit on a permanent colored surface in both themes. */
+.prose-chat.text-white strong, .prose-chat.text-white em { color:inherit; }
 
-  /* BRAND (GREEN SYSTEM) */
-  --brand: #418e4d;
-  --brand-dark: #357a41;
-  --brand-light: #6ee7b7;
-
-  /* SURFACES */
-  --surface: #0f0f10;
-  --surface-card: #18181b;
-  --surface-hover: #1f1f23;
-  --surface-border: #2a2a30;
-
-  /* TEXT */
-  --text-primary: #fafaf9;
-  --text-secondary: #a8a29e;
-  --text-muted: #57534e;
-
-  /* STATUS */
-  --success: #22c55e;
-  --warning: #eab308;
-  --error: #ef4444;
-  --info: #3b82f6;
-}
-
-/* ============================= */
-/* BASE RESET */
-/* ============================= */
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html,
-body {
-  background: var(--surface);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-/* ============================= */
-/* TYPOGRAPHY */
-/* ============================= */
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-}
-
-/* ============================= */
-/* SCROLLBAR */
-/* ============================= */
-
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--surface-border);
-  border-radius: 2px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
-
-/* Chat scroll (minimal) */
-.chat-scroll::-webkit-scrollbar {
-  width: 2px;
-}
-.chat-scroll::-webkit-scrollbar-thumb {
-  background: var(--surface-border);
-}
-
-/* ============================= */
-/* PROSE (CHAT TEXT) */
-/* ============================= */
-
-.prose-chat strong {
-  color: var(--brand-light);
-  font-weight: 600;
-}
-
-.prose-chat em {
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.prose-chat code {
-  background: var(--surface-border);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.85em;
-}
-
-/* ============================= */
-/* SHIMMER LOADING */
-/* ============================= */
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    #18181b 25%,
-    #2a2a30 50%,
-    #18181b 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* ============================= */
-/* GRADIENT TEXT */
-/* ============================= */
-
-.gradient-text {
-  background: linear-gradient(
-    135deg,
-    #418e4d,
-    #6ee7b7,
-    #bbf7d0
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ============================= */
-/* GLOW EFFECT */
-/* ============================= */
-
-.glow-brand {
-  box-shadow:
-    0 0 20px rgba(65, 142, 77, 0.2),
-    0 0 40px rgba(65, 142, 77, 0.1);
-}
-
-/* ============================= */
-/* STATUS DOT */
-/* ============================= */
-
-@keyframes statusPulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.3);
-  }
-}
-
-.status-dot-active {
-  animation: statusPulse 2s ease-in-out infinite;
-}
-
-/* ============================= */
-/* TYPING ANIMATION */
-/* ============================= */
-
-@keyframes typing {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-.typing-dot:nth-child(1) {
-  animation: typing 1s ease-in-out infinite 0s;
-}
-.typing-dot:nth-child(2) {
-  animation: typing 1s ease-in-out infinite 0.2s;
-}
-.typing-dot:nth-child(3) {
-  animation: typing 1s ease-in-out infinite 0.4s;
-}
+/* Safety information uses a quiet surface with a distinct amber edge in both themes. */
+.hf-safety { background:var(--panel); color:var(--text); border-color:var(--border); border-left:3px solid var(--warning); }
+.hf-safety ul, .hf-safety p:not(:first-child) { color:var(--muted); }
+textarea.hf-input { height:auto; min-height:6rem; resize:vertical; }

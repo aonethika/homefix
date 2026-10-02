@@ -1,143 +1,52 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { bookingReturn } from '@/services/booking-return';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, clearError } from '@/store/authSlice';
-import { RootState, AppDispatch } from '@/store';
+import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
+import Brand from '@/components/Brand';
+import { clearError, login } from '@/store/authSlice';
+import type { AppDispatch, RootState } from '@/store';
 
 export default function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const { loading, error, user } = useSelector((s: RootState) => s.auth);
-
+  const [next, setNext] = useState('/chat');
+  useEffect(() => { setNext(bookingReturn()); }, []);
+  const { loading, error, user } = useSelector((state: RootState) => state.auth);
   const [form, setForm] = useState({ email: '', password: '' });
 
-  useEffect(() => {
-    if (!user) return;
-    if (user.role === 'WORKER') router.replace('/worker');
-    else if (user.role === 'ADMIN') router.replace('/admin');
-    else router.replace('/chat');
-  }, [user]);
+  useEffect(() => { dispatch(clearError()); }, [dispatch]);
 
-  useEffect(() => {
-    dispatch(clearError());
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(login(form));
-  };
-
-  const fillDemo = (role: string) => {
-    const demo = {
-      user: { email: 'user@homefix.com', password: 'password123' },
-      worker: { email: 'plumber@homefix.com', password: 'password123' },
-      admin: { email: 'admin@homefix.com', password: 'password123' },
-    };
-    setForm(demo[role as keyof typeof demo]);
-  };
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
+    <main className="hf-page relative grid min-h-screen overflow-hidden lg:grid-cols-[1.05fr_.95fr]">
+      <section className="relative hidden overflow-hidden bg-gradient-to-br from-blue-800 via-blue-700 to-teal-600 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+        <div className="absolute -right-24 -top-20 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" />
+        <Brand href="/" tone="light" />
+        <div className="relative max-w-lg"><p className="mb-4 text-xs font-bold uppercase tracking-[.2em] text-teal-300">One account, every repair</p><h1 className="font-display text-5xl font-bold leading-[1.08] tracking-[-.05em]">Welcome back to a home that simply works.</h1><p className="mt-5 text-base leading-7 text-blue-100/70">Book trusted help, follow live job updates, approve pricing, and pay securely from one calm workspace.</p></div>
+        <p className="text-xs text-blue-200/50">Trusted home services across Kerala</p>
+      </section>
 
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#418e4d] flex items-center justify-center text-lg text-white shadow-md">
-              🏠
-            </div>
-            <span className="text-xl font-semibold text-white tracking-tight">
-              HomeFix
-            </span>
-          </Link>
+      <section className="flex items-center justify-center px-5 py-10 sm:px-10">
+        <div className="w-full max-w-md">
+          <div className="mb-9 lg:hidden"><Brand href="/" /></div>
+          <p className="text-xs font-bold uppercase tracking-[.18em] text-teal-600">Homeowner sign in</p>
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-[-.04em] text-[var(--text)]">Good to see you again.</h2>
+          <p className="mt-2 text-sm text-[var(--muted)]">Enter your zoon account details.</p>
 
-          <h1 className="text-2xl font-semibold text-white">
-            Welcome back
-          </h1>
-          <p className="text-sm text-[#a1a1aa] mt-1">
-            Sign in to your account
-          </p>
+          <form onSubmit={async event => { event.preventDefault(); const result = await dispatch(login({ ...form, portal: 'USER' })); if (login.fulfilled.match(result)) router.replace(result.payload.user.role === 'WORKER' ? '/worker' : bookingReturn()); }} className="mt-7 space-y-4">
+            <label className="block text-sm font-semibold text-[var(--text)]">Email address<input type="email" autoComplete="email" required value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" className="hf-input mt-2" /></label>
+            <label className="block text-sm font-semibold text-[var(--text)]"><span className="flex justify-between">Password<Link href="/forgot-password" className="text-xs text-blue-600">Forgot password?</Link></span><input type="password" autoComplete="current-password" minLength={8} required value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} placeholder="At least 8 characters" className="hf-input mt-2" /></label>
+            {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm text-rose-700">{error}</div>}
+            <button disabled={loading} className="hf-primary flex w-full items-center justify-center gap-2 px-5 py-3.5 disabled:cursor-wait disabled:opacity-60">{loading ? 'Signing in…' : 'Continue'}{!loading && <ArrowRight size={17} />}</button>
+          </form>
+          <p className="mt-4 text-center text-xs text-[var(--muted)]">Managing zoon? <Link href="/admin" className="font-bold text-[var(--brand)]">Admin sign in</Link></p><p className="mt-6 text-center text-sm text-[var(--muted)]">New to zoon? <Link href={`/register?next=${encodeURIComponent(next)}`} className="font-bold text-blue-600">Create an account</Link></p>
+          <Link href={`/professional-login?next=${encodeURIComponent(next)}`} className="mt-5 block text-center text-sm font-bold text-blue-600">Professional sign in</Link><div className="mt-7 border-t border-[var(--border)] pt-6"><Link href="/professional-register" className="flex items-center justify-center gap-2 rounded-xl bg-[var(--soft)] px-3 py-2.5 text-xs font-bold text-[var(--text)]"><BriefcaseBusiness size={15}/>Join as a professional</Link></div>
         </div>
-
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {['user', 'worker', 'admin'].map(role => (
-            <button
-              key={role}
-              onClick={() => fillDemo(role)}
-              className="py-1.5 text-xs capitalize bg-[#18181b] border border-[#2a2a30] hover:border-[#418e4d]/40 text-[#a1a1aa] hover:text-[#6ee7b7] rounded-lg transition"
-            >
-              Demo {role}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-[#2a2a30]" />
-          <span className="text-[10px] uppercase tracking-widest text-[#52525b]">
-            or sign in
-          </span>
-          <div className="flex-1 h-px bg-[#2a2a30]" />
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          <div>
-            <label className="block text-xs text-[#a1a1aa] mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              placeholder="you@example.com"
-              className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-[#418e4d] focus:ring-2 focus:ring-[#418e4d]/20 rounded-xl px-4 py-3 text-sm text-white placeholder-[#52525b] outline-none transition"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs text-[#a1a1aa] mb-1.5">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={form.password}
-              onChange={e => setForm({ ...form, password: e.target.value })}
-              placeholder="••••••••"
-              className="w-full bg-[#18181b] border border-[#2a2a30] focus:border-[#418e4d] focus:ring-2 focus:ring-[#418e4d]/20 rounded-xl px-4 py-3 text-sm text-white placeholder-[#52525b] outline-none transition"
-            />
-          </div>
-
-          {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-[#418e4d] hover:bg-[#357a41] disabled:opacity-50 text-white font-medium rounded-xl transition shadow-md hover:shadow-lg active:scale-[0.98]"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-
-        </form>
-
-        <p className="text-center text-sm text-[#52525b] mt-6">
-          Don’t have an account?{' '}
-          <Link
-            href="/register"
-            className="text-[#6ee7b7] hover:text-[#34d399] font-medium transition"
-          >
-            Create one
-          </Link>
-        </p>
-
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

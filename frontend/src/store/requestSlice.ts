@@ -1,5 +1,6 @@
+import { logout } from './authSlice';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { requestAPI, workerAPI } from '@/services/api';
+import { getApiError, requestAPI, workerAPI } from '@/services/api';
 
 interface RequestState {
   requests: any[];
@@ -20,7 +21,7 @@ export const fetchUserRequests = createAsyncThunk('request/fetchUser', async (_,
     const { data } = await requestAPI.getMyRequests();
     return data.data;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message);
+    return rejectWithValue(getApiError(err, 'Failed to load requests'));
   }
 });
 
@@ -29,7 +30,7 @@ export const fetchWorkerRequests = createAsyncThunk('request/fetchWorker', async
     const { data } = await workerAPI.getMyRequests();
     return data.data;
   } catch (err: any) {
-    return rejectWithValue(err.response?.data?.message);
+    return rejectWithValue(getApiError(err, 'Failed to load jobs'));
   }
 });
 
@@ -46,6 +47,7 @@ const requestSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(logout, () => initialState);
     builder
       .addCase(fetchUserRequests.pending, (s) => { s.loading = true; })
       .addCase(fetchUserRequests.fulfilled, (s, a) => { s.loading = false; s.requests = a.payload; })

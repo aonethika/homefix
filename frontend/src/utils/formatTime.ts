@@ -54,15 +54,15 @@ export const STATUS_LABELS: Record<string, string> = {
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  PENDING: 'text-yellow-400 bg-yellow-400/10',
-  SEARCHING: 'text-blue-400 bg-blue-400/10',
-  ASSIGNED: 'text-purple-400 bg-purple-400/10',
-  ACCEPTED: 'text-cyan-400 bg-cyan-400/10',
-  IN_PROGRESS: 'text-orange-400 bg-orange-400/10',
-  AWAITING_APPROVAL: 'text-amber-400 bg-amber-400/10',
+  PENDING: 'text-[var(--warning)] bg-yellow-400/10',
+  SEARCHING: 'text-[var(--brand)] bg-blue-400/10',
+  ASSIGNED: 'text-[var(--brand)] bg-blue-400/10',
+  ACCEPTED: 'text-[var(--brand)] bg-cyan-400/10',
+  IN_PROGRESS: 'text-[var(--warning)] bg-orange-400/10',
+  AWAITING_APPROVAL: 'text-[var(--warning)] bg-amber-400/10',
   PAYMENT_PENDING: 'text-pink-400 bg-pink-400/10',
-  PAID: 'text-green-400 bg-green-400/10',
-  COMPLETED: 'text-emerald-400 bg-emerald-400/10',
-  CANCELLED: 'text-red-400 bg-red-400/10',
+  PAID: 'text-[var(--success)] bg-green-400/10',
+  COMPLETED: 'text-[var(--success)] bg-emerald-400/10',
+  CANCELLED: 'text-[var(--danger)] bg-red-400/10',
   REJECTED: 'text-red-500 bg-red-500/10',
 };

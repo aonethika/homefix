@@ -8,7 +8,7 @@ interface Props {
 export default function StatusBadge({ status, size = 'md' }: Props) {
   const colorClass =
     STATUS_COLORS[status] ||
-    'text-[#a8a29e] bg-[#2a2a30] border border-[#3a3a40]';
+    'text-[var(--muted)] bg-[var(--soft)] border border-[var(--border)]';
 
   const label = STATUS_LABELS[status] || status;
 

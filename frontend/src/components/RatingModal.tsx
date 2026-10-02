@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { ratingAPI } from '@/services/api';
+import { platformAPI, ratingAPI } from '@/services/api';
 
 interface Props {
   requestId: string;
@@ -14,6 +14,7 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [stage, setStage] = useState<'worker' | 'app'>('worker');
 
   const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
 
@@ -21,8 +22,13 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
     if (!score) return setError('Please select a rating');
     setLoading(true);
     try {
-      await ratingAPI.submit({ requestId, score, comment });
-      onSuccess();
+      if (stage === 'worker') {
+        await ratingAPI.submit({ requestId, score, comment });
+        setStage('app'); setScore(0); setHovered(0); setComment('');
+      } else {
+        await platformAPI.submitAppRating({ score, comment });
+        onSuccess();
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to submit rating');
     } finally {
@@ -32,16 +38,16 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-2 sm:p-4">
-      <div className="w-full max-w-sm bg-[#18181b] border border-[#2a2a30] rounded-t-2xl sm:rounded-2xl overflow-hidden">
+      <div className="w-full max-w-sm bg-[var(--panel)] border border-[var(--border)] rounded-t-2xl sm:rounded-2xl overflow-hidden">
 
-        <div className="p-4 sm:p-5 border-b border-[#2a2a30] flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-[var(--border)] flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-white text-base sm:text-lg">Rate Your Experience</h3>
-            <p className="text-[11px] text-[#a8a29e] mt-0.5">Your feedback matters</p>
+            <h3 className="font-bold text-[var(--text)] text-base sm:text-lg">{stage === 'worker' ? 'Rate your professional' : 'Rate the zoon app'}</h3>
+            <p className="text-[11px] text-[var(--muted)] mt-0.5">{stage === 'worker' ? 'How was the service?' : 'One last step—how was the overall experience?'}</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-[#2a2a30] hover:bg-[#3a3a40] text-[#a8a29e]"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--soft)] hover:bg-[var(--soft)] text-[var(--muted)]"
           >
             ×
           </button>
@@ -64,7 +70,7 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
           </div>
 
           {(score || hovered) > 0 && (
-            <p className="text-center text-xs sm:text-sm text-[#6ee7b7] font-medium mb-3">
+            <p className="text-center text-xs sm:text-sm text-[var(--brand)] font-medium mb-3">
               {labels[hovered || score]}
             </p>
           )}
@@ -74,7 +80,7 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
             onChange={e => setComment(e.target.value)}
             placeholder="Share your experience (optional)..."
             rows={3}
-            className="w-full bg-[#0f0f10] border border-[#2a2a30] rounded-xl px-3 py-2 text-sm text-white placeholder-[#57534e] focus:outline-none focus:border-[#418e4d] resize-none mb-3"
+            className="w-full bg-[var(--page)] border border-[var(--border)] rounded-xl px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--muted)] focus:outline-none focus:border-[#2563eb] resize-none mb-3"
           />
 
           {error && (
@@ -84,9 +90,9 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
           <button
             onClick={handleSubmit}
             disabled={loading || !score}
-            className="w-full py-3 bg-gradient-to-r from-[#418e4d] to-[#357a41] hover:from-[#4fa65b] hover:to-[#3f8c4b] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-r from-[#2563eb] to-[#0d9488] hover:from-[#3b82f6] hover:to-[#2563eb] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
           >
-            {loading ? 'Submitting...' : '⭐ Submit Rating'}
+            {loading ? 'Submitting...' : stage === 'worker' ? 'Continue' : '⭐ Finish review'}
           </button>
         </div>
       </div>

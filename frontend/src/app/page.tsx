@@ -1,134 +1,97 @@
 'use client';
+
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
+import { ArrowRight, BadgeCheck, Clock3, Droplets, Hammer, Snowflake, Sparkles, Star, Zap } from 'lucide-react';
 import { RootState } from '@/store';
+import Brand from '@/components/Brand';
+
+const services = [
+  { icon: Droplets, name: 'Plumbing', desc: 'Leaks, clogs & fittings', tint: 'text-[var(--brand)] bg-sky-400/10' },
+  { icon: Zap, name: 'Electrical', desc: 'Wiring, faults & fixtures', tint: 'text-[var(--brand)] bg-amber-400/10' },
+  { icon: Snowflake, name: 'AC service', desc: 'Cooling, gas & repairs', tint: 'text-[var(--brand)] bg-cyan-400/10' },
+  { icon: Hammer, name: 'Carpentry', desc: 'Doors, furniture & polish', tint: 'text-[var(--brand)] bg-blue-400/10' },
+];
 
 export default function HomePage() {
-  const { user } = useSelector((s: RootState) => s.auth);
-
-  const services = [
-    { emoji: '🔧', name: 'Plumber', desc: 'Leaks, clogs, drainage' },
-    { emoji: '⚡', name: 'Electrician', desc: 'Wiring, faults, fittings' },
-    { emoji: '❄️', name: 'AC Technician', desc: 'Servicing, gas, repair' },
-    { emoji: '🪵', name: 'Carpenter', desc: 'Furniture, doors, polish' },
-  ];
-
-  const steps = [
-    { n: '01', title: 'Describe Your Issue', desc: 'Just chat naturally — our AI understands what you need.' },
-    { n: '02', title: 'Get Matched', desc: 'We find the best professional near you in seconds.' },
-    { n: '03', title: 'Job Done & Pay', desc: 'Worker completes the job, you approve price and pay safely.' },
-  ];
+  const user = useSelector((s: RootState) => s.auth.user);
+  const primaryHref = user ? (user.role === 'WORKER' ? '/worker' : user.role === 'ADMIN' ? '/' : '/chat') : '/login';
 
   return (
-    <div className="min-h-screen bg-[#0f0f10] text-white">
-
-      <nav className="border-b border-[#2a2a30] px-4 sm:px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#418e4d] to-[#357a41] flex items-center justify-center shadow-lg shadow-[#418e4d]/30">🏠</div>
-          <span className="font-bold text-base sm:text-lg text-white">HomeFix</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {user ? (
-            <Link
-              href={user.role === 'WORKER' ? '/worker' : '/chat'}
-              className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#418e4d] to-[#357a41] hover:from-[#4fa65b] hover:to-[#3f8c4b] text-white text-xs sm:text-sm font-semibold rounded-xl transition-all"
-            >
-              {user.role === 'WORKER' ? 'Dashboard →' : 'Open Chat →'}
+    <div className="app-shell">
+      <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--panel)]/80 backdrop-blur-xl">
+        <nav className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 sm:px-8">
+          <Brand />
+          <div className="flex items-center gap-2 sm:gap-5">
+            <Link href="/workers" className="hidden text-sm text-[var(--muted)] transition hover:text-[var(--text)] sm:block">Professionals</Link>
+            {!user && <Link href="/login" className="px-3 py-2 text-sm text-[var(--muted)] transition hover:text-[var(--text)]">Sign in</Link>}
+            <Link href={primaryHref} className="inline-flex items-center gap-2 rounded-xl bg-blue-400 px-4 py-2.5 text-sm font-bold text-[#090e1d] transition hover:-translate-y-0.5 hover:bg-blue-300">
+              {user ? 'Open workspace' : 'Book a service'} <ArrowRight size={15} />
             </Link>
-          ) : (
-            <>
-              <Link href="/login" className="text-xs sm:text-sm text-[#a8a29e] hover:text-white">Login</Link>
-              <Link href="/register" className="px-3 sm:px-4 py-2 bg-gradient-to-r from-[#418e4d] to-[#357a41] text-white text-xs sm:text-sm font-semibold rounded-xl">
-                Get Started
+          </div>
+        </nav>
+      </header>
+
+      <main>
+        <section className="relative mx-auto grid max-w-6xl gap-14 px-5 pb-20 pt-16 sm:px-8 sm:pt-24 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:pb-28">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-300/15 bg-blue-300/[.07] px-3 py-1.5 text-xs font-semibold text-[var(--brand)]">
+              <Sparkles size={13} /> One chat. The right expert. Done.
+            </div>
+            <h1 className="text-balance font-display text-[2.75rem] font-bold leading-[1.04] tracking-[-.055em] sm:text-6xl lg:text-[4.4rem]">
+              Home repairs without the <span className="text-[var(--brand)]">runaround.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-[var(--muted)] sm:text-lg">
+              Tell us what broke. zoon understands the issue, finds a trusted professional nearby, and keeps everything—from arrival to payment—in one place.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href={primaryHref} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-400 px-6 py-3.5 font-bold text-[#090e1d] shadow-[0_14px_40px_rgba(52,211,153,.18)] transition hover:-translate-y-0.5 hover:bg-blue-300">
+                Describe your issue <ArrowRight size={18} />
               </Link>
-            </>
-          )}
-        </div>
-      </nav>
-
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-20 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#418e4d]/10 border border-[#418e4d]/20 rounded-full text-[10px] sm:text-xs text-[#6ee7b7] mb-6 sm:mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#418e4d]" />
-          AI-Powered Home Services
-        </div>
-
-        <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-4 sm:mb-6">
-          Home repairs,<br />
-          <span className="text-[#6ee7b7]">solved with a chat</span>
-        </h1>
-
-        <p className="text-sm sm:text-lg text-[#a8a29e] max-w-xl mx-auto mb-8 sm:mb-10">
-          Describe your problem in plain language. We detect the issue, find the best professional, and manage everything.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-          <Link
-            href={user ? '/chat' : '/register'}
-            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-[#418e4d] to-[#357a41] text-white font-semibold rounded-xl text-sm sm:text-base"
-          >
-            Start Chat →
-          </Link>
-
-          <Link
-            href="/workers"
-            className="w-full sm:w-auto px-6 py-3 bg-[#18181b] border border-[#2a2a30] text-[#a8a29e] hover:text-white rounded-xl text-sm sm:text-base"
-          >
-            Browse Workers
-          </Link>
-        </div>
-      </section>
-
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
-        <p className="text-center text-[10px] sm:text-xs uppercase tracking-widest text-[#57534e] mb-6 sm:mb-8">
-          Services
-        </p>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          {services.map(s => (
-            <div key={s.name} className="bg-[#18181b] border border-[#2a2a30] rounded-xl p-4 text-center">
-              <div className="text-2xl sm:text-3xl mb-2">{s.emoji}</div>
-              <p className="font-semibold text-white text-xs sm:text-sm">{s.name}</p>
-              <p className="text-[10px] sm:text-[11px] text-[#57534e]">{s.desc}</p>
+              <Link href="/workers" className="inline-flex items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--soft)] px-6 py-3.5 font-semibold text-[var(--text)] transition hover:bg-[var(--soft)]">Browse professionals</Link>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
-        <p className="text-center text-[10px] sm:text-xs uppercase tracking-widest text-[#57534e] mb-8">
-          How It Works
-        </p>
-
-        <div className="grid sm:grid-cols-3 gap-4 sm:gap-6">
-          {steps.map((step, i) => (
-            <div key={i} className="bg-[#18181b] border border-[#2a2a30] rounded-xl p-4 sm:p-6">
-              <p className="text-2xl font-bold text-[#2a2a30] mb-2">{step.n}</p>
-              <p className="font-semibold text-white mb-1">{step.title}</p>
-              <p className="text-xs sm:text-sm text-[#a8a29e]">{step.desc}</p>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-[var(--muted)]">
+              <span className="flex items-center gap-2"><BadgeCheck size={16} className="text-[var(--brand)]" /> Verified experts</span>
+              <span className="flex items-center gap-2"><Clock3 size={16} className="text-[var(--brand)]" /> Real-time updates</span>
+              <span className="flex items-center gap-2"><Star size={16} className="text-[var(--brand)]" /> Rated service</span>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 pb-20">
-        <div className="bg-gradient-to-br from-[#418e4d]/10 to-transparent border border-[#418e4d]/20 rounded-2xl p-6 sm:p-10 text-center">
-          <h2 className="text-xl sm:text-3xl font-bold text-white mb-2">Ready to fix it?</h2>
-          <p className="text-[#a8a29e] mb-6 text-sm">Join homeowners using HomeFix.</p>
+          <div className="relative mx-auto w-full max-w-lg lg:ml-auto">
+            <div className="absolute -inset-8 rounded-full bg-blue-400/[.06] blur-3xl" />
+            <div className="card float-slow relative overflow-hidden rounded-[2rem] p-4 sm:p-6">
+              <div className="mb-5 flex items-center justify-between border-b border-[var(--border)] pb-4">
+                <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-400 text-[#090e1d]"><Sparkles size={19} /></span><div><p className="font-semibold">FixBot</p><p className="text-xs text-[var(--brand)]">Ready to help</p></div></div>
+                <span className="rounded-full bg-blue-300/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--brand)]">Online</span>
+              </div>
+              <div className="space-y-4 py-2">
+                <div className="max-w-[82%] rounded-2xl rounded-tl-md bg-[var(--soft)] px-4 py-3 text-sm leading-6 text-[var(--text)]">What can I help you fix today?</div>
+                <div className="ml-auto max-w-[84%] rounded-2xl rounded-tr-md bg-blue-400 px-4 py-3 text-sm font-medium leading-6 text-[#0b1020]">Water is leaking under my kitchen sink.</div>
+                <div className="max-w-[88%] rounded-2xl rounded-tl-md bg-[var(--soft)] px-4 py-3 text-sm leading-6 text-[var(--text)]"><span className="font-semibold text-[var(--brand)]">Plumbing issue detected.</span><br />I’ll find an available plumber near you now.</div>
+              </div>
+              <div className="mt-5 flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-2 pl-4 text-sm text-[var(--muted)]"><span className="flex-1">Describe your issue…</span><span className="grid h-10 w-10 place-items-center rounded-xl bg-blue-400 text-[#0b1020]"><ArrowRight size={17} /></span></div>
+            </div>
+          </div>
+        </section>
 
-          <Link
-            href={user ? '/chat' : '/register'}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#418e4d] to-[#357a41] text-white font-semibold rounded-xl text-sm"
-          >
-            <span>🏠</span>
-            <span>Get Started</span>
-          </Link>
-        </div>
-      </section>
+        <section className="border-y border-[var(--border)] bg-[var(--soft)]">
+          <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+            <div className="mb-10 flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><p className="eyebrow">Help for the everyday</p><h2 className="mt-3 font-display text-3xl font-bold tracking-[-.04em] sm:text-4xl">One place for every fix.</h2></div><p className="max-w-sm text-sm leading-6 text-[var(--muted)]">Book in a few messages and follow the job from request to completion.</p></div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {services.map(({ icon: Icon, name, desc, tint }) => <Link href={user ? '/chat' : '/login'} key={name} className="group card rounded-2xl p-5 transition duration-300 hover:-translate-y-1 hover:border-[var(--border)]"><span className={`mb-7 grid h-11 w-11 place-items-center rounded-xl ${tint}`}><Icon size={21} /></span><h3 className="font-display font-bold">{name}</h3><p className="mt-1 text-sm text-[var(--muted)]">{desc}</p><ArrowRight size={17} className="mt-5 text-[var(--muted)] transition group-hover:translate-x-1 group-hover:text-[var(--brand)]" /></Link>)}
+            </div>
+          </div>
+        </section>
 
-      <footer className="border-t border-[#2a2a30] py-6 text-center text-[10px] sm:text-xs text-[#57534e]">
-        © 2026 HomeFix · Built for Kerala
-      </footer>
+        <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+          <div className="card grid gap-10 overflow-hidden rounded-[2rem] p-7 sm:p-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+            <div><p className="eyebrow">Simple by design</p><h2 className="mt-3 text-balance font-display text-3xl font-bold tracking-[-.04em] sm:text-4xl">From problem to professional in minutes.</h2><p className="mt-4 text-[var(--muted)]">No phone tag, confusing forms, or hunting through listings.</p></div>
+            <ol className="space-y-3">{[['01','Tell us what happened','Chat naturally—no service category required.'],['02','We find your best match','Available professionals are matched by skill and location.'],['03','Track, approve, and pay','Get live updates and finish securely in one flow.']].map(([n,title,desc]) => <li key={n} className="flex gap-4 rounded-2xl border border-[var(--border)] bg-[var(--soft)] p-4"><span className="font-display text-sm font-bold text-[var(--brand)]">{n}</span><div><h3 className="font-semibold">{title}</h3><p className="mt-1 text-sm leading-5 text-[var(--muted)]">{desc}</p></div></li>)}</ol>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-[var(--border)]"><div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between sm:px-8"><Brand /><p>Trusted home services, built for Kerala.</p><p>© 2026 zoon</p></div></footer>
     </div>
   );
 }

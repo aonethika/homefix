@@ -1,0 +1,8 @@
+'use client';
+import { BadgeCheck, ShieldCheck } from 'lucide-react';
+import ProfessionalProfileEditor from '@/components/ProfessionalProfileEditor';
+import { useWorkerWorkspace } from '@/components/worker/WorkerWorkspace';
+export default function WorkerProfilePage() {
+  const { user } = useWorkerWorkspace(); const profile = user.workerProfile;
+  return <><h1 className="text-2xl font-bold tracking-tight">My profile</h1><p className="mb-7 mt-2 text-sm text-[var(--muted)]">Manage what customers see and check your application status.</p><div className="grid items-start gap-5 xl:grid-cols-[1fr_300px]"><ProfessionalProfileEditor key={user.id} /><aside className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"><h2 className="flex items-center gap-2 font-semibold"><ShieldCheck size={18} />Verification</h2><dl className="mt-5 space-y-4 text-sm">{[['Application', profile?.applicationStatus || 'PENDING'], ['Face check', profile?.faceVerified ? 'Checked' : 'Review needed'], ['PAN record', profile?.panVerified ? 'Checked' : 'Review needed'], ['Public profile', profile?.applicationStatus === 'APPROVED' && profile?.isPublic ? 'Visible' : 'Hidden']].map(([label, value]) => <div key={label}><dt className="text-xs text-[var(--muted)]">{label}</dt><dd className="mt-1 font-semibold">{value}</dd></div>)}</dl>{profile?.applicationNote && <p className="mt-5 text-sm text-[var(--muted)]">{profile.applicationNote}</p>}<p className="mt-5 flex items-start gap-2 text-xs leading-5 text-[var(--muted)]"><BadgeCheck size={16} className="mt-0.5 shrink-0" />Your identity documents stay private.</p></aside></div></>;
+}

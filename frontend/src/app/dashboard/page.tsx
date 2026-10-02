@@ -1,210 +1,62 @@
 'use client';
-
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '@/store';
-import { fetchUserRequests } from '@/store/requestSlice';
-import { logout } from '@/store/authSlice';
-import StatusBadge from '@/components/StatusBadge';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  formatDate,
-  formatCurrency,
-  SERVICE_EMOJIS,
-  SERVICE_LABELS,
-} from '@/utils/formatTime';
+import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import { ArrowUpRight, CalendarDays, CheckCircle2, ClipboardList, Clock3, MapPin, MessageCircle, Plus, Search, Star, Wallet } from 'lucide-react';
+import { AppDispatch, RootState } from '@/store';
+import { fetchUserRequests } from '@/store/requestSlice';
+import { formatCurrency, formatDate, SERVICE_LABELS } from '@/utils/formatTime';
+import Brand from '@/components/Brand';
+import WorkspaceTools from '@/components/WorkspaceTools';
+import LogoutButton from '@/components/LogoutButton';
+import StatusBadge from '@/components/StatusBadge';
+import ServiceIcon from '@/components/ServiceIcon';
+import CancelRequestButton from '@/components/CancelRequestButton';
 
+const closed = (request: any) => ['PAID', 'CANCELLED', 'REJECTED'].includes(request.status) || request.payment?.status === 'PAID';
 export default function DashboardPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user, token } = useSelector((s: RootState) => s.auth);
-  const { requests, loading } = useSelector((s: RootState) => s.request);
-
+  const { requests, loading, error } = useSelector((s: RootState) => s.request);
+  const [filter, setFilter] = useState('All');
+  const [query, setQuery] = useState('');
   useEffect(() => {
-    if (!token || !user) {
-      router.replace('/login');
-      return;
-    }
-    if (user.role !== 'USER') {
-      router.replace(user.role === 'WORKER' ? '/worker' : '/admin');
-      return;
-    }
+    if (!token || !user) { router.replace('/login'); return; }
+    if (user.role !== 'USER') { router.replace(user.role === 'WORKER' ? '/worker' : '/admin'); return; }
     dispatch(fetchUserRequests());
-  }, [token, user]);
-
-  if (!user) return null;
-
-  return (
-    <div className="min-h-screen bg-[#0f0f10] text-white">
-
-      {/* HEADER */}
-      <header className="sticky top-0 z-20 bg-[#18181b]/80 backdrop-blur border-b border-[#2a2a30] px-4 sm:px-6 py-3 flex items-center justify-between">
-        
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/chat" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#418e4d] to-[#357a41] flex items-center justify-center text-sm">
-              🏠
-            </div>
-            <span className="font-semibold text-sm hidden sm:block">HomeFix</span>
-          </Link>
-
-          <span className="text-[#2a2a30] hidden sm:block">/</span>
-          <span className="text-xs sm:text-sm text-[#a8a29e]">My Requests</span>
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link
-            href="/chat"
-            className="text-xs px-3 py-1.5 bg-[#418e4d]/10 hover:bg-[#418e4d]/20 text-[#6ee7b7] border border-[#418e4d]/20 rounded-lg transition"
-          >
-            + New
-          </Link>
-
-          <button
-            onClick={() => {
-              dispatch(logout());
-              router.push('/login');
-            }}
-            className="text-xs text-[#57534e] hover:text-[#a8a29e]"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-
-      {/* CONTENT */}
-      <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-
-        {/* USER */}
-        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#418e4d]/10 border border-[#418e4d]/20 flex items-center justify-center font-bold text-[#6ee7b7]">
-            {user.name[0].toUpperCase()}
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-xl font-semibold">{user.name}</h1>
-            <p className="text-xs sm:text-sm text-[#a8a29e]">{user.email}</p>
-          </div>
-        </div>
-
-        {/* STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 sm:mb-8">
-          {[
-            {
-              label: 'Total Requests',
-              value: requests.length,
-              icon: '📋',
-            },
-            {
-              label: 'Completed',
-              value: requests.filter(r => r.status === 'COMPLETED').length,
-              icon: '✅',
-            },
-            {
-              label: 'Total Spent',
-              value: formatCurrency(
-                requests
-                  .filter(r => r.payment?.status === 'PAID')
-                  .reduce((s: number, r: any) => s + (r.finalPrice || 0), 0)
-              ),
-              icon: '💰',
-            },
-          ].map(stat => (
-            <div
-              key={stat.label}
-              className="bg-[#18181b] border border-[#2a2a30] rounded-xl p-4 text-center"
-            >
-              <div className="text-xl mb-1">{stat.icon}</div>
-              <p className="text-lg font-semibold">{stat.value}</p>
-              <p className="text-[10px] text-[#57534e] uppercase tracking-wide">
-                {stat.label}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* TITLE */}
-        <h2 className="text-xs sm:text-sm font-semibold text-[#a8a29e] uppercase tracking-widest mb-4">
-          Service History
-        </h2>
-
-        {/* STATES */}
-        {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="h-24 shimmer rounded-xl" />
-            ))}
-          </div>
-        ) : requests.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-4xl mb-4">🏠</div>
-            <p className="text-[#a8a29e] mb-2">No requests yet</p>
-            <p className="text-sm text-[#57534e] mb-6">
-              Start a chat to book your first service
-            </p>
-            <Link
-              href="/chat"
-              className="px-5 py-2.5 bg-[#418e4d] hover:bg-[#357a41] text-white text-sm font-semibold rounded-xl transition"
-            >
-              Start Chat
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {requests.map((req: any) => (
-              <div
-                key={req.id}
-                className="bg-[#18181b] border border-[#2a2a30] hover:border-[#418e4d]/30 rounded-xl p-4 sm:p-5 transition"
-              >
-                <div className="flex justify-between items-start gap-3 mb-3">
-                  
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-[#2a2a30] flex items-center justify-center text-lg">
-                      {SERVICE_EMOJIS[req.serviceType] || '🔧'}
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium">
-                        {SERVICE_LABELS[req.serviceType]}
-                      </p>
-                      <p className="text-xs text-[#57534e]">
-                        {formatDate(req.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <StatusBadge status={req.status} />
-                </div>
-
-                <p className="text-xs text-[#a8a29e] mb-3 line-clamp-2">
-                  {req.description}
-                </p>
-
-                <div className="flex flex-wrap justify-between items-center gap-2">
-                  
-                  <div className="flex flex-wrap gap-3 text-xs text-[#57534e]">
-                    {req.worker && (
-                      <span>👷 {req.worker.user.name}</span>
-                    )}
-                    {req.finalPrice && (
-                      <span className="text-[#6ee7b7] font-semibold">
-                        {formatCurrency(req.finalPrice)}
-                      </span>
-                    )}
-                  </div>
-
-                  {req.rating && (
-                    <div className="text-yellow-400 text-xs">
-                      {'⭐'.repeat(req.rating.score)}
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
-  );
+    const timer = window.setInterval(() => dispatch(fetchUserRequests()), 20000);
+    return () => clearInterval(timer);
+  }, [token, user?.id, user?.role, dispatch, router]);
+  if (!user || user.role !== 'USER') return null;
+  const active = requests.filter(r => !closed(r));
+  const upcoming = active.filter(r => r.scheduledAt && new Date(r.scheduledAt) > new Date());
+  const shown = requests.filter(r => (filter === 'All' || filter === 'Active' && !closed(r) || filter === 'Upcoming' && upcoming.includes(r) || filter === 'History' && closed(r)) && `${r.serviceKey || r.serviceType} ${r.description} ${r.worker?.user?.name || ''}`.toLowerCase().includes(query.toLowerCase()));
+  const refresh = async () => { await dispatch(fetchUserRequests()); };
+  return <div className="min-h-screen bg-[var(--page)] text-[var(--text)]">
+    <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-2 border-b border-[var(--border)] bg-[var(--panel)] px-4 py-2 sm:px-8"><Brand /><div className="flex items-center gap-1"><Link href="/chat" className="hidden min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold text-[var(--muted)] sm:flex"><MessageCircle size={17} />FixBot</Link><LogoutButton className="hidden sm:inline-flex" /><WorkspaceTools /></div></header>
+    <main className="mx-auto max-w-6xl px-4 py-7 sm:px-8 sm:py-10">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs font-semibold uppercase tracking-widest text-[var(--brand)]">Your home, taken care of</p><h1 className="mt-2 text-3xl font-bold tracking-tight">My bookings</h1><p className="mt-2 text-sm text-[var(--muted)]">Welcome back, {user.name.split(' ')[0]}. Keep track of every visit in one place.</p></div><Link href="/workers" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"><Plus size={18} />Book a service</Link></div>
+      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">{[
+        { label: 'Active requests', value: active.length, Icon: ClipboardList },
+        { label: 'Upcoming visits', value: upcoming.length, Icon: CalendarDays },
+        { label: 'Completed jobs', value: requests.filter(r => ['COMPLETED', 'PAID'].includes(r.status) || r.payment?.status === 'PAID').length, Icon: CheckCircle2 },
+        { label: 'Total paid', value: formatCurrency(requests.filter(r => r.payment?.status === 'PAID').reduce((sum, r) => sum + Number(r.finalPrice || 0), 0)), Icon: Wallet },
+      ].map(({ label, value, Icon }) => <div key={label} className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-4 sm:p-5"><Icon size={20} className="mb-4 text-[var(--brand)]" /><p className="break-words text-2xl font-bold tracking-tight">{value}</p><p className="mt-1 text-xs text-[var(--muted)]">{label}</p></div>)}</div>
+      <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div className="flex gap-1 overflow-x-auto rounded-xl bg-[var(--soft)] p-1" aria-label="Filter bookings">{['All', 'Active', 'Upcoming', 'History'].map(label => <button key={label} onClick={() => setFilter(label)} aria-pressed={filter === label} className={`min-h-10 rounded-lg px-4 text-sm font-semibold ${filter === label ? 'bg-[var(--panel)] text-[var(--text)] shadow-sm' : 'text-[var(--muted)]'}`}>{label}</button>)}</div><div className="relative"><Search size={17} className="absolute left-3 top-3.5 text-[var(--muted)]" /><input aria-label="Search bookings" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search service or professional" className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--panel)] pl-10 pr-3 text-sm sm:w-72" /></div></div>
+      {error && <p role="alert" className="mb-4 text-sm text-[var(--danger)]">{error}</p>}
+      {loading && !requests.length ? <div className="grid gap-4 md:grid-cols-2">{[1, 2].map(i => <div key={i} className="h-64 rounded-2xl shimmer" />)}</div> : !shown.length ? <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--panel)] px-6 py-16 text-center"><ClipboardList size={32} className="mx-auto text-[var(--muted)]" /><h2 className="mt-4 text-lg font-semibold">{requests.length ? 'No matching bookings' : 'Your first service starts here'}</h2><p className="mt-2 text-sm text-[var(--muted)]">{requests.length ? 'Try another filter or search term.' : 'Describe what needs fixing or choose a professional.'}</p>{!requests.length && <Link href="/chat" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand)]">Start a conversation<ArrowUpRight size={16} /></Link>}</div> : <div className="grid gap-4 md:grid-cols-2">{shown.map(request => {
+        const service = request.serviceKey || request.serviceType;
+        const conversation = request.bookingStage ? `/bookings/${request.id}` : request.sessionId ? `/chat?sessionId=${request.sessionId}` : null;
+        return <article key={request.id} className="flex min-w-0 flex-col rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5 transition hover:shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-500/10 text-[var(--brand)]"><ServiceIcon service={service} /></span><div><h2 className="text-base font-semibold">{SERVICE_LABELS[service] || String(service || 'Home service').replaceAll('_', ' ')}</h2><p className="mt-1 text-xs text-[var(--muted)]">Requested {formatDate(request.createdAt)}</p></div></div><StatusBadge status={request.status} /></div>
+          <p className="mb-5 mt-4 line-clamp-2 text-sm leading-6 text-[var(--muted)]">{request.description}</p>
+          <div className="mb-5 space-y-3 text-sm"><p className="flex items-center gap-2"><Clock3 size={16} className="shrink-0 text-[var(--muted)]" />{request.scheduledAt ? new Date(request.scheduledAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'On-demand service'}</p>{request.userAddress && <p className="flex items-start gap-2 text-[var(--muted)]"><MapPin size={16} className="mt-0.5 shrink-0" /><span className="line-clamp-2">{request.userAddress}</span></p>}</div>
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] py-4 text-sm"><span className="font-semibold">{request.worker?.user?.name || 'Finding your professional'}</span>{request.finalPrice != null && <span className="font-semibold">{formatCurrency(request.finalPrice)}</span>}{request.rating && <span className="inline-flex items-center gap-1 text-xs text-[var(--warning)]"><Star size={13} />{request.rating.score}/5</span>}</div>
+          <div className="flex flex-wrap gap-2">{conversation && <Link href={conversation} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--soft)] px-4 text-sm font-semibold"><MessageCircle size={16} />Open conversation</Link>}{['ACCEPTED', 'IN_PROGRESS'].includes(request.status) && <Link href={`/tracking/${request.id}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold text-[var(--brand)]"><MapPin size={16} />Track visit</Link>}<CancelRequestButton request={request} onCancelled={refresh} onChanged={refresh} /></div>
+        </article>;
+      })}</div>}
+    </main>
+  </div>;
 }
