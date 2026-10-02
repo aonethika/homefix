@@ -12,7 +12,7 @@ export const createOrder = async (req, res, next) => {
 
 export const verifyPayment = async (req, res, next) => {
   try {
-    const payment = await paymentService.verifyPayment(req.body);
+    const payment = await paymentService.verifyPayment(req.body, req.user.id);
     res.json({ success: true, data: payment });
   } catch (err) { next(err); }
 };

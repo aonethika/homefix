@@ -3,6 +3,7 @@ import prisma from '../lib/prisma.js';
 import razorpay from '../lib/razorpay.js';
 import { getSocketIO } from '../socket/socket.js';
 import { ChatService } from './chat.service.js';
+import { sendNotification, notifyAdmins } from './notification.service.js';
 
 const chatService = new ChatService();
 
@@ -28,7 +29,7 @@ export class PaymentService {
     const order = await razorpay.orders.create({
       amount: amountPaise,
       currency: 'INR',
-      receipt: `homefix_${requestId.substring(0, 16)}`,
+      receipt: `zoon_${requestId.substring(0, 16)}`,
       notes: { requestId, userId },
     });
 
@@ -56,9 +57,20 @@ export class PaymentService {
     };
   }
 
-  async verifyPayment({ razorpayOrderId, razorpayPaymentId, razorpaySignature, requestId }) {
+  async verifyPayment({ razorpayOrderId, razorpayPaymentId, razorpaySignature, requestId }, userId) {
+    const existingPayment = await prisma.payment.findUnique({
+      where: { requestId },
+      include: { request: true },
+    });
+    if (!existingPayment || existingPayment.request.userId !== userId) {
+      throw Object.assign(new Error('Payment not found'), { status: 404 });
+    }
+    if (existingPayment.razorpayOrderId !== razorpayOrderId) {
+      throw Object.assign(new Error('Payment order does not match this request'), { status: 400 });
+    }
+    if (existingPayment.status === 'PAID') return existingPayment;
     // Verify signature
-    const body = razorpayOrderId + '|' + razorpayPaymentId;
+    const body = existingPayment.razorpayOrderId + '|' + razorpayPaymentId;
     const expectedSig = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(body)
@@ -84,6 +96,7 @@ export class PaymentService {
       data: { status: 'PAID' },
       include: { worker: { include: { user: true } } },
     });
+    if (request.workerId) await prisma.workerProfile.update({ where: { id: request.workerId }, data: { isAvailable: true } });
 
     // Notify via socket
     const io = getSocketIO();
@@ -92,7 +105,11 @@ export class PaymentService {
       if (request.workerId) {
         io.to(`worker:${request.worker.userId}`).emit('payment:completed', { requestId, amount: request.finalPrice });
       }
+      io.to('admins').emit('admin:request-updated', { requestId, status: 'PAID' });
     }
+    await sendNotification(request.userId, 'Payment confirmed', `Your payment of ₹${request.finalPrice} was successful.`, 'SUCCESS', { requestId });
+    if (request.worker?.userId) await sendNotification(request.worker.userId, 'Payment received', `₹${request.finalPrice} was paid for your job.`, 'SUCCESS', { requestId });
+    await notifyAdmins('Payment completed', `Payment of ₹${request.finalPrice} was completed.`, 'SUCCESS', { requestId });
 
     // Update chat session
     if (request.sessionId) {

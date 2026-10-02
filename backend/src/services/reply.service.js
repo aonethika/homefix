@@ -21,7 +21,7 @@ export class ReplyService {
     const greetings = [
       "Hi! I'm FixBot 🏠 — your smart home services assistant. What issue are you facing today?",
       "Hello! Need a home repair or service? Just describe the problem and I'll find the right professional for you! 🛠️",
-      "Welcome to HomeFix! Tell me about the issue at home and I'll connect you with the right expert. 🏠",
+      "Welcome to zoon! Tell me about the issue at home and I'll connect you with the right expert. 🏠",
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
@@ -57,7 +57,7 @@ export class ReplyService {
 
   noWorkerFound(serviceType) {
     const name = SERVICE_NAMES[serviceType] || 'professional';
-    return `😔 I couldn't find an available ${name} near you right now. Please try again in a few minutes, or I can notify you when one becomes available!`;
+    return `No approved ${name} is available for this location right now. Professionals may be busy or offline. Try searching again later or choose a different service location below.`;
   }
 
   priceProposed(workerName, price) {
@@ -69,7 +69,7 @@ export class ReplyService {
   }
 
   paymentCompleted(amount) {
-    return `🎊 Payment of **₹${amount.toFixed(2)}** received successfully! Thank you for using HomeFix.\n\nHow was your experience? Please take a moment to **rate your service professional** — your feedback helps us maintain quality! ⭐`;
+    return `🎊 Payment of **₹${amount.toFixed(2)}** received successfully! Thank you for using zoon.\n\nHow was your experience? Please take a moment to **rate your service professional** — your feedback helps us maintain quality! ⭐`;
   }
 
   cancelled() {

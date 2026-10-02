@@ -5,7 +5,7 @@ export const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ success: false, message: 'No token provided' });
+      return res.status(401).json({ success: false, message: 'Please sign in to continue.' });
     }
 
     const token = authHeader.split(' ')[1];
@@ -17,12 +17,13 @@ export const authenticate = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ success: false, message: 'User not found' });
+      return res.status(401).json({ success: false, message: 'Please sign in again to continue.' });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: 'Invalid token' });
+    if (['JsonWebTokenError', 'TokenExpiredError', 'NotBeforeError'].includes(error.name)) return res.status(401).json({ success: false, message: 'Your session has expired. Please sign in again.' });
+    next(error);
   }
 };

@@ -23,12 +23,33 @@ model User {
   ratingsGiven  Rating[]         @relation("RatingsGiven")
   requests      ServiceRequest[] @relation("UserRequests")
   workerProfile WorkerProfile?
+  notifications Notification[]
+  complaints    Complaint[]      @relation("ComplaintAuthor")
+  categoryRequests ServiceCategory[] @relation("CategoryRequester")
+  appRatings       AppRating[]
+  passwordOtps     PasswordResetOtp[]
 }
 
 model WorkerProfile {
   id              String           @id @default(uuid())
   userId          String           @unique
-  serviceType     ServiceType
+  serviceType     ServiceType?
+  serviceKey      String?
+  applicationStatus ApplicationStatus @default(PENDING)
+  applicationNote String?
+  panNumber       String?          @unique
+  profilePhotoKey String?
+  panDocumentKey  String?
+  faceFrontKey    String?
+  faceLeftKey     String?
+  faceRightKey    String?
+  panVerified     Boolean          @default(false)
+  faceVerified    Boolean          @default(false)
+  kycReport       Json?
+  idDocument      String?          @db.Text
+  idDocumentName  String?
+  idDocumentMime  String?
+  isPublic        Boolean          @default(false)
   isAvailable     Boolean          @default(true)
   latitude        Float?
   longitude       Float?
@@ -41,6 +62,7 @@ model WorkerProfile {
   ratingsReceived Rating[]         @relation("RatingsReceived")
   requests        ServiceRequest[] @relation("WorkerRequests")
   user            User             @relation(fields: [userId], references: [id])
+  services        WorkerService[]
 }
 
 model ChatSession {
@@ -70,16 +92,22 @@ model ServiceRequest {
   sessionId     String?        @unique
   userId        String
   workerId      String?
-  serviceType   ServiceType
+  serviceType   ServiceType?
+  serviceKey    String?
   description   String
   status        RequestStatus  @default(PENDING)
   userLatitude  Float?
   userLongitude Float?
   userAddress   String?
   proposedPrice Float?
+  counterPrice  Float?
   finalPrice    Float?
   userApproved  Boolean        @default(false)
   workerNotes   String?
+  @@index([bookingStage, expiresAt])
+  bookingStage  String?
+  expiresAt     DateTime?
+  cancellationReason String?
   scheduledAt   DateTime?
   acceptedAt    DateTime?
   startedAt     DateTime?
@@ -91,6 +119,80 @@ model ServiceRequest {
   session       ChatSession?   @relation(fields: [sessionId], references: [id])
   user          User           @relation("UserRequests", fields: [userId], references: [id])
   worker        WorkerProfile? @relation("WorkerRequests", fields: [workerId], references: [id])
+  complaints    Complaint[]
+}
+
+model ServiceCategory {
+  id            String         @id @default(uuid())
+  key           String         @unique
+  name          String
+  description   String?
+  icon          String         @default("Wrench")
+  keywords      String[]
+  status        ApprovalStatus @default(PENDING)
+  requestedById String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  requestedBy   User?          @relation("CategoryRequester", fields: [requestedById], references: [id])
+  workers       WorkerService[]
+}
+
+model WorkerService {
+  workerId   String
+  categoryId String
+  createdAt  DateTime        @default(now())
+  worker     WorkerProfile   @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  category   ServiceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([workerId, categoryId])
+}
+
+model Complaint {
+  id          String          @id @default(uuid())
+  authorId    String
+  requestId   String?
+  subject     String
+  message     String
+  status      ComplaintStatus @default(OPEN)
+  adminNote   String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  author      User            @relation("ComplaintAuthor", fields: [authorId], references: [id])
+  request     ServiceRequest? @relation(fields: [requestId], references: [id])
+}
+
+model Notification {
+  dedupeKey String? @unique
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("INFO")
+  read      Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model AppRating {
+  id        String   @id @default(uuid())
+  userId    String
+  score     Int
+  comment   String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model PasswordResetOtp {
+  id        String   @id @default(uuid())
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
 }
 
 model Payment {
@@ -152,6 +254,7 @@ enum ChatState {
   INIT
   ISSUE_CAPTURED
   NEED_LOCATION
+  CHOOSE_WORKER
   SEARCHING
   ASSIGNED
   AWAITING_PRICE
@@ -165,4 +268,38 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+// Ownership and single-use claims for anonymous direct-to-S3 uploads.
+model PendingUpload {
+  key         String   @id
+  ownerHash   String
+  purpose     String
+  contentType String
+  expiresAt   DateTime
+  claimId     String?
+  usedAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([claimId])
+  @@index([expiresAt])
 }

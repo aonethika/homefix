@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  toggleAvailability, updateLocation, getMyRequests,
+  toggleAvailability, updateLocation, getMyRequests, updateProfile,
   acceptRequest, rejectRequest, updateJobStatus, setPrice, getStats, getAllWorkers
 } from '../controllers/worker.controller.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
@@ -11,6 +11,8 @@ const router = Router();
 router.get('/', getAllWorkers); // Public - list workers
 
 router.use(authenticate);
+
+router.patch('/profile', requireRole('WORKER'), updateProfile);
 
 // Worker-only routes
 router.post('/availability', requireRole('WORKER'), toggleAvailability);

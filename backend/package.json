@@ -1,5 +1,5 @@
 {
-  "name": "homefix-backend",
+  "name": "zoon-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -8,15 +8,24 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "node src/prisma/seed.js"
+    "db:seed": "node src/prisma/seed.js",
+    "test": "node --test --test-isolation=none test/kyc.test.js test/booking-flow.test.js test/appointments.test.js test/booking-conversations.test.js test/chat-lifecycle.test.js",
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
+    "@aws-sdk/client-rekognition": "^3.1136.0",
+    "@aws-sdk/client-s3": "^3.1136.0",
+    "@aws-sdk/client-textract": "^3.1136.0",
+    "@aws-sdk/s3-presigned-post": "^3.1136.0",
+    "@aws-sdk/s3-request-presigner": "^3.1136.0",
     "@prisma/client": "^5.10.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
+    "express-rate-limit": "^8.7.0",
     "jsonwebtoken": "^9.0.2",
+    "openai": "^7.20.0",
     "razorpay": "^2.9.2",
     "socket.io": "^4.7.4",
     "uuid": "^9.0.1",

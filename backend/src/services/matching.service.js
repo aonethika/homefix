@@ -6,14 +6,18 @@ export class MatchingService {
    * Find and score available workers for a service request
    */
   async findBestWorker(serviceType, userLat, userLon, maxDistanceKm = 25) {
+    const categoryFilter = [{ serviceKey: serviceType }, { services: { some: { category: { key: serviceType, status: 'APPROVED' } } } }];
+    if (['PLUMBER', 'ELECTRICIAN', 'AC_TECHNICIAN', 'CARPENTER'].includes(serviceType)) categoryFilter.push({ serviceType });
     const workers = await prisma.workerProfile.findMany({
       where: {
-        serviceType,
         isAvailable: true,
+        applicationStatus: 'APPROVED',
+        OR: categoryFilter,
+        requests: { none: { OR: [{ scheduledAt: null, bookingStage: null }, { scheduledAt: { lte: new Date(Date.now() + 3600_000) } }], status: { in: ['ACCEPTED', 'IN_PROGRESS', 'AWAITING_APPROVAL', 'PAYMENT_PENDING'] } } },
       },
       include: {
-        user: { select: { id: true, name: true, phone: true } },
-        _count: { select: { requests: { where: { status: { in: ['ACCEPTED', 'IN_PROGRESS'] } } } } },
+        user: { select: { id: true, name: true } },
+        _count: { select: { requests: { where: { status: { in: ['ACCEPTED', 'IN_PROGRESS'] } } }, ratingsReceived: true } },
       },
     });
 
@@ -23,7 +27,8 @@ export class MatchingService {
     const scored = workers.map(worker => {
       const wLat = worker.latitude ?? 0;
       const wLon = worker.longitude ?? 0;
-      const distance = (userLat && userLon) ? calculateDistance(userLat, userLon, wLat, wLon) : 10;
+      const hasCoordinates = Number.isFinite(Number(userLat)) && Number.isFinite(Number(userLon));
+      const distance = hasCoordinates ? calculateDistance(Number(userLat), Number(userLon), wLat, wLon) : 10;
 
       if (distance > maxDistanceKm) return null;
 
@@ -49,16 +54,23 @@ export class MatchingService {
    * Get all available workers for a service type with distances
    */
   async getNearbyWorkers(serviceType, userLat, userLon, maxDistanceKm = 25) {
+    const categoryFilter = [{ serviceKey: serviceType }, { services: { some: { category: { key: serviceType, status: 'APPROVED' } } } }];
+    if (['PLUMBER', 'ELECTRICIAN', 'AC_TECHNICIAN', 'CARPENTER'].includes(serviceType)) categoryFilter.push({ serviceType });
     const workers = await prisma.workerProfile.findMany({
-      where: { serviceType, isAvailable: true },
-      include: { user: { select: { id: true, name: true } } },
+      where: {
+        isAvailable: true,
+        applicationStatus: 'APPROVED',
+        OR: categoryFilter,
+        requests: { none: { OR: [{ scheduledAt: null, bookingStage: null }, { scheduledAt: { lte: new Date(Date.now() + 3600_000) } }], status: { in: ['ACCEPTED', 'IN_PROGRESS', 'AWAITING_APPROVAL', 'PAYMENT_PENDING'] } } },
+      },
+      include: { user: { select: { id: true, name: true } }, _count: { select: { ratingsReceived: true } } },
     });
 
     return workers
       .map(w => ({
         ...w,
-        distance: (userLat && userLon && w.latitude && w.longitude)
-          ? calculateDistance(userLat, userLon, w.latitude, w.longitude)
+        distance: ([userLat, userLon, w.latitude, w.longitude].every(value => value != null && Number.isFinite(Number(value))))
+          ? calculateDistance(Number(userLat), Number(userLon), Number(w.latitude), Number(w.longitude))
           : null,
       }))
       .filter(w => w.distance === null || w.distance <= maxDistanceKm)

@@ -37,7 +37,13 @@ const CANCEL_KEYWORDS = ['cancel', 'stop', 'nevermind', 'never mind', 'forget it
 
 const CONFIRM_KEYWORDS = ['yes', 'ok', 'okay', 'sure', 'confirm', 'approve', 'agree', 'proceed', 'go ahead', 'pay', 'accept'];
 
-const REJECT_KEYWORDS = ['no', 'reject', 'decline', 'too expensive', 'not ok', 'disagree', 'refuse'];
+const REJECT_KEYWORDS = ['no', 'reject', 'decline', 'too expensive', 'not ok', 'not okay', 'do not approve', "don't approve", 'disagree', 'refuse'];
+
+function containsPhrase(text, phrase) {
+  const normalizedText = text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const normalizedPhrase = phrase.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return ` ${normalizedText} `.includes(` ${normalizedPhrase} `);
+}
 
 /**
  * Detect which service type is mentioned in text
@@ -84,27 +90,26 @@ export function detectCancelIntent(text) {
  * Detect confirmation intent
  */
 export function detectConfirmIntent(text) {
-  const lower = text.toLowerCase().trim();
-  return CONFIRM_KEYWORDS.some(kw => lower === kw || lower.startsWith(kw + ' ') || lower.endsWith(' ' + kw));
+  return CONFIRM_KEYWORDS.some(keyword => containsPhrase(text, keyword));
 }
 
 /**
  * Detect rejection intent
  */
 export function detectRejectIntent(text) {
-  const lower = text.toLowerCase().trim();
-  return REJECT_KEYWORDS.some(kw => lower === kw || lower.includes(kw));
+  return REJECT_KEYWORDS.some(keyword => containsPhrase(text, keyword));
 }
 
 /**
  * Full intent analysis
  */
 export function analyzeIntent(text) {
+  const wantsReject = detectRejectIntent(text);
   return {
     serviceType: detectServiceType(text),
     urgency: detectUrgency(text),
     wantsCancel: detectCancelIntent(text),
-    wantsConfirm: detectConfirmIntent(text),
-    wantsReject: detectRejectIntent(text),
+    wantsConfirm: !wantsReject && detectConfirmIntent(text),
+    wantsReject,
   };
 }

@@ -8,15 +8,30 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   const hashedPassword = await bcrypt.hash('password123', 12);
+  const adminPassword = await bcrypt.hash('admin@123', 12);
+
+  const categories = [
+    { key: 'PLUMBER', name: 'Plumbing', icon: 'Droplets', keywords: ['pipe', 'leak', 'water', 'drain', 'tap', 'toilet', 'plumber'] },
+    { key: 'ELECTRICIAN', name: 'Electrical', icon: 'Zap', keywords: ['electric', 'power', 'wire', 'light', 'switch', 'socket', 'electrician'] },
+    { key: 'AC_TECHNICIAN', name: 'AC & Cooling', icon: 'Snowflake', keywords: ['ac', 'air conditioner', 'cooling', 'compressor', 'hvac'] },
+    { key: 'CARPENTER', name: 'Carpentry', icon: 'Hammer', keywords: ['wood', 'furniture', 'door', 'cabinet', 'carpenter'] },
+  ];
+  for (const category of categories) {
+    await prisma.serviceCategory.upsert({
+      where: { key: category.key },
+      update: { ...category, status: 'APPROVED' },
+      create: { ...category, status: 'APPROVED' },
+    });
+  }
 
   // Create Admin
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@homefix.com' },
-    update: {},
+    where: { email: 'admin@example.com' },
+    update: { password: adminPassword, role: 'ADMIN' },
     create: {
       name: 'Admin User',
-      email: 'admin@homefix.com',
-      password: hashedPassword,
+      email: 'admin@example.com',
+      password: adminPassword,
       role: 'ADMIN',
       phone: '+919999999999',
     },
@@ -25,11 +40,11 @@ async function main() {
 
   // Create test user
   const user = await prisma.user.upsert({
-    where: { email: 'user@homefix.com' },
+    where: { email: 'user@zoon.com' },
     update: {},
     create: {
       name: 'Rahul Kumar',
-      email: 'user@homefix.com',
+      email: 'user@zoon.com',
       password: hashedPassword,
       role: 'USER',
       phone: '+919876543210',
@@ -42,10 +57,10 @@ async function main() {
 
   // Create Workers
   const workers = [
-    { name: 'Suresh Plumber', email: 'plumber@homefix.com', serviceType: 'PLUMBER', lat: 11.262, lon: 75.783 },
-    { name: 'Arun Electric', email: 'electric@homefix.com', serviceType: 'ELECTRICIAN', lat: 11.255, lon: 75.776 },
-    { name: 'Babu AC Tech', email: 'ac@homefix.com', serviceType: 'AC_TECHNICIAN', lat: 11.265, lon: 75.790 },
-    { name: 'Ravi Carpenter', email: 'carpenter@homefix.com', serviceType: 'CARPENTER', lat: 11.252, lon: 75.785 },
+    { name: 'Suresh Plumber', email: 'plumber@zoon.com', serviceType: 'PLUMBER', lat: 11.262, lon: 75.783 },
+    { name: 'Arun Electric', email: 'electric@zoon.com', serviceType: 'ELECTRICIAN', lat: 11.255, lon: 75.776 },
+    { name: 'Babu AC Tech', email: 'ac@zoon.com', serviceType: 'AC_TECHNICIAN', lat: 11.265, lon: 75.790 },
+    { name: 'Ravi Carpenter', email: 'carpenter@zoon.com', serviceType: 'CARPENTER', lat: 11.252, lon: 75.785 },
   ];
 
   for (const w of workers) {
@@ -72,14 +87,27 @@ async function main() {
         },
       },
     });
+    await prisma.workerProfile.update({
+      where: { userId: worker.id },
+      data: { serviceKey: w.serviceType, applicationStatus: 'APPROVED', isAvailable: true },
+    });
+    const profile = await prisma.workerProfile.findUnique({ where: { userId: worker.id } });
+    const category = await prisma.serviceCategory.findUnique({ where: { key: w.serviceType } });
+    if (profile && category) {
+      await prisma.workerService.upsert({
+        where: { workerId_categoryId: { workerId: profile.id, categoryId: category.id } },
+        create: { workerId: profile.id, categoryId: category.id },
+        update: {},
+      });
+    }
     console.log(`✅ Worker created: ${worker.name} (${w.serviceType})`);
   }
 
   console.log('\n🎉 Seed complete!');
   console.log('Login credentials (all use password: password123):');
-  console.log('  Admin: admin@homefix.com');
-  console.log('  User:  user@homefix.com');
-  console.log('  Workers: plumber@homefix.com, electric@homefix.com, ac@homefix.com, carpenter@homefix.com');
+  console.log('  Admin: admin@example.com (password: admin@123)');
+  console.log('  User:  user@zoon.com');
+  console.log('  Workers: plumber@zoon.com, electric@zoon.com, ac@zoon.com, carpenter@zoon.com');
 }
 
 main()
