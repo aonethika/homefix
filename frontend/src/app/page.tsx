@@ -42,7 +42,7 @@ export default function HomePage() {
               Home repairs without the <span className="text-[var(--brand)]">runaround.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-[var(--muted)] sm:text-lg">
-              Tell us what broke. zoon understands the issue, finds a trusted professional nearby, and keeps everything—from arrival to payment—in one place.
+              Tell us what broke. Zoon understands the issue, finds a trusted professional nearby, and keeps everything—from arrival to payment—in one place.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href={primaryHref} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-400 px-6 py-3.5 font-bold text-[#090e1d] shadow-[0_14px_40px_rgba(52,211,153,.18)] transition hover:-translate-y-0.5 hover:bg-blue-300">
@@ -91,7 +91,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-[var(--border)]"><div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between sm:px-8"><Brand /><p>Trusted home services, built for Kerala.</p><p>© 2026 zoon</p></div></footer>
+      <footer className="border-t border-[var(--border)]"><div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 text-sm text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between sm:px-8"><Brand /><p>Trusted home services, built for Kerala.</p><p>© 2026 Zoon</p></div></footer>
     </div>
   );
 }

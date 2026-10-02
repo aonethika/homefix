@@ -47,7 +47,7 @@ export default function PaymentModal({ requestId, amount, onSuccess, onClose }: 
         key: order.key,
         amount: order.amount,
         currency: order.currency,
-        name: 'zoon',
+        name: 'Zoon',
         description: 'Home Service Payment',
         order_id: order.orderId,
         prefill: {

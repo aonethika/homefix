@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Book a service | zoon',
+  title: 'Book a service | Zoon',
   description: 'Describe your home repair and get matched with a trusted professional.',
 };
 

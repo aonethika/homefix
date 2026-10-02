@@ -15,10 +15,10 @@ export default function ProfessionalChoice({ worker, onSelect }: { worker: any; 
     catch { setError('Reviews could not load. Close and reopen to retry.'); }
   };
   return <article className="w-full min-w-0 rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-4 text-[var(--text)]">
-    <div className="flex items-center justify-between gap-3"><b>{worker.name}</b><span className="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-800">zoon approved</span></div>
+    <div className="flex items-center justify-between gap-3"><b>{worker.name}</b><span className="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-800">Zoon approved</span></div>
     <div className="mt-3 flex flex-wrap gap-2 text-xs">{worker.faceVerified && <span className="rounded-full bg-teal-500/10 px-3 py-1 text-teal-600">Face photo checks passed</span>}{worker.panVerified && <span className="rounded-full bg-teal-500/10 px-3 py-1 text-teal-600">PAN record checked</span>}</div>
     <p className="mt-2 text-[11px] leading-5 text-[var(--muted)]">Approval and identity checks do not guarantee work quality or personal safety. Review their experience and customer feedback.</p>
-    <p className="mt-2 text-xs leading-5">{worker.bio || 'zoon service professional'}</p>
+    <p className="mt-2 text-xs leading-5">{worker.bio || 'Zoon service professional'}</p>
     {typeof worker.isAvailable === 'boolean' && <p className="mt-2 text-xs text-[var(--muted)]">{worker.isAvailable ? 'Available for immediate requests' : 'Offline for immediate requests'}</p>}
     <p className="mt-2 text-xs text-[var(--muted)]">★ {Number(worker.rating || 0).toFixed(1)} · {worker.reviewCount ?? worker._count?.ratingsReceived ?? 0} reviews · {worker.totalJobs || 0} completed jobs{worker.distance != null ? ` · ${Number(worker.distance).toFixed(1)} km straight-line distance` : ''}</p>
     <button onClick={showProfile} aria-expanded={open} className="mt-3 text-xs font-bold text-blue-500">{open ? 'Hide profile and reviews' : 'View profile and reviews'}</button>

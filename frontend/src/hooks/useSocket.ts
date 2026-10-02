@@ -89,18 +89,18 @@ export function useSocket(token: string | null, role?: string) {
       notify({ title: 'Payment confirmed', message: `₹${Number(amount).toLocaleString('en-IN')} was paid successfully.`, tone: 'success' });
     };
     const onAdminUpdate = ({ status }: any) => {
-      window.dispatchEvent(new Event('zoon:data-changed'));
+      window.dispatchEvent(new Event('Zoon:data-changed'));
       notify({ title: 'Platform activity', message: `A service request is now ${String(status).replaceAll('_', ' ').toLowerCase()}.` });
     };
     const onNotification = (item: any) => {
-      notify({ title: item.title || 'zoon update', message: item.message || 'There is a new update.', tone: item.type === 'SUCCESS' || item.type === 'APPROVED' ? 'success' : 'info' });
-      window.dispatchEvent(new Event('zoon:data-changed'));
+      notify({ title: item.title || 'Zoon update', message: item.message || 'There is a new update.', tone: item.type === 'SUCCESS' || item.type === 'APPROVED' ? 'success' : 'info' });
+      window.dispatchEvent(new Event('Zoon:data-changed'));
       if (role === 'WORKER') {
         dispatch(fetchProfile());
         dispatch(fetchWorkerRequests());
       }
     };
-    const onWorkerLocation = (location: any) => window.dispatchEvent(new CustomEvent('zoon:worker-location', { detail: location }));
+    const onWorkerLocation = (location: any) => window.dispatchEvent(new CustomEvent('Zoon:worker-location', { detail: location }));
     const onMessage = ({ requestId, message }: any) => {
       if (role === 'USER' && store.getState().chat.currentRequest?.id !== requestId) return;
       if (role === 'USER') dispatch(addChatMessage(message));

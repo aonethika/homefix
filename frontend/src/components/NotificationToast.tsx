@@ -3,24 +3,24 @@
 import { useEffect, useState } from 'react';
 import { Bell, CheckCircle2, X } from 'lucide-react';
 
-export type zoonNotification = { title: string; message: string; tone?: 'info' | 'success' };
+export type ZoonNotification = { title: string; message: string; tone?: 'info' | 'success' };
 
-export function notify(detail: zoonNotification) {
-  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('zoon:notification', { detail }));
+export function notify(detail: ZoonNotification) {
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('Zoon:notification', { detail }));
 }
 
 export default function NotificationToast() {
-  const [items, setItems] = useState<(zoonNotification & { id: number })[]>([]);
+  const [items, setItems] = useState<(ZoonNotification & { id: number })[]>([]);
 
   useEffect(() => {
     const listener = (event: Event) => {
-      const detail = (event as CustomEvent<zoonNotification>).detail;
+      const detail = (event as CustomEvent<ZoonNotification>).detail;
       const id = Date.now() + Math.random();
       setItems(current => [...current.slice(-2), { ...detail, id }]);
       window.setTimeout(() => setItems(current => current.filter(item => item.id !== id)), 5000);
     };
-    window.addEventListener('zoon:notification', listener);
-    return () => window.removeEventListener('zoon:notification', listener);
+    window.addEventListener('Zoon:notification', listener);
+    return () => window.removeEventListener('Zoon:notification', listener);
   }, []);
 
   return (

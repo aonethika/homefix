@@ -56,26 +56,26 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     try {
-      const token = localStorage.getItem('zoon_admin_token');
-      const stored = localStorage.getItem('zoon_admin_user');
+      const token = localStorage.getItem('Zoon_admin_token');
+      const stored = localStorage.getItem('Zoon_admin_user');
       const user = stored ? JSON.parse(stored) : null;
       if (token && user?.role === 'ADMIN') {
         setAdminToken(token);
         setAdminUser(user);
       } else {
-        localStorage.removeItem('zoon_admin_token');
-        localStorage.removeItem('zoon_admin_user');
+        localStorage.removeItem('Zoon_admin_token');
+        localStorage.removeItem('Zoon_admin_user');
       }
     } catch {
-      localStorage.removeItem('zoon_admin_token');
-      localStorage.removeItem('zoon_admin_user');
+      localStorage.removeItem('Zoon_admin_token');
+      localStorage.removeItem('Zoon_admin_user');
     } finally {
       setAuthReady(true);
     }
   }, []);
 
   useEffect(() => { if (authReady && adminToken && adminUser?.role === 'ADMIN') load(); }, [authReady, adminToken, adminUser, load]);
-  useEffect(() => { if (!adminToken) return; window.addEventListener('zoon:data-changed', load); return () => window.removeEventListener('zoon:data-changed', load); }, [adminToken, load]);
+  useEffect(() => { if (!adminToken) return; window.addEventListener('Zoon:data-changed', load); return () => window.removeEventListener('Zoon:data-changed', load); }, [adminToken, load]);
 
   const stats = useMemo(() => ({
     users: data.users.filter((item: any) => item.role === 'USER').length,
@@ -94,8 +94,8 @@ export default function AdminDashboard() {
       const response = await authAPI.login({ ...credentials, portal: 'ADMIN' });
       const result = response.data.data;
       if (result.user?.role !== 'ADMIN') throw new Error('This account does not have admin access.');
-      localStorage.setItem('zoon_admin_token', result.token);
-      localStorage.setItem('zoon_admin_user', JSON.stringify(result.user));
+      localStorage.setItem('Zoon_admin_token', result.token);
+      localStorage.setItem('Zoon_admin_user', JSON.stringify(result.user));
       setAdminToken(result.token);
       setAdminUser(result.user);
     } catch (error: any) {
@@ -106,8 +106,8 @@ export default function AdminDashboard() {
   };
 
   const signOut = () => {
-    localStorage.removeItem('zoon_admin_token');
-    localStorage.removeItem('zoon_admin_user');
+    localStorage.removeItem('Zoon_admin_token');
+    localStorage.removeItem('Zoon_admin_user');
     setAdminToken(null);
     setAdminUser(null);
     setData(emptyData);
@@ -148,10 +148,10 @@ export default function AdminDashboard() {
           {(tab === 'orders' || tab === 'appointments') && data.requests.filter((item: any) => tab !== 'appointments' || item.scheduledAt || item.bookingStage).sort((a: any, b: any) => tab === 'appointments' ? new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime() : 0).filter((item: any) => includes(item.user?.name, item.worker?.user?.name, item.description, item.serviceKey, item.serviceType, item.status)).map((item: any) => <Row key={item.id} title={`${item.serviceKey || item.serviceType || 'Service'} · ${item.user?.name || 'Homeowner'}`} subtitle={`${item.description} · Professional: ${item.worker?.user?.name || 'Not assigned'} · ${item.scheduledAt ? `Appointment ${new Date(item.scheduledAt).toLocaleString()}` : `Created ${formatDate(item.createdAt)}`}`} side={<div className="flex items-center gap-3">{item.finalPrice && <b className="text-sm text-emerald-600">{formatCurrency(item.finalPrice)}</b>}<StatusBadge status={item.status} />{item.bookingStage && <Link className="text-sm text-blue-500" href={`/bookings/${item.id}?admin=1`}>Review {item.bookingStage.toLowerCase()}</Link>}</div>} />)}
           {tab === 'users' && data.users.filter((item: any) => item.role === 'USER' && includes(item.name, item.email, item.phone, item.address)).map((item: any) => <Row key={item.id} title={item.name} subtitle={`${item.email}${item.phone ? ` · ${item.phone}` : ''}${item.address ? ` · ${item.address}` : ''}`} side={<span className="text-xs text-[var(--muted)]">Joined {formatDate(item.createdAt)}</span>} />)}
           {tab === 'professionals' && data.workers.filter((item: any) => includes(item.user?.name, item.user?.email, item.panNumber, item.serviceKey, item.serviceType, item.applicationStatus)).map((item: any) => { const pendingCategory = item.services?.some((service: any) => service.category.status === 'PENDING'); return <Row key={item.id} title={item.user?.name} subtitle={`${item.services?.map((service: any) => service.category.name).join(', ') || item.serviceKey || item.serviceType || 'Unspecified'} · ${item.user?.email} · ${item.isPublic ? 'Public profile' : 'Private profile'} | PAN ${item.panNumber || 'not provided'} · ${Number(item.rating || 0).toFixed(1)} rating · ${item.totalJobs} jobs`} side={<div className="flex flex-wrap items-center gap-2">{<button onClick={() => setReviewing(item)} className="rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-bold text-blue-700">Review KYC</button>}<span className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold ${item.applicationStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}><BadgeCheck size={13} />{item.applicationStatus === 'APPROVED' ? 'Approved' : item.applicationStatus === 'REJECTED' ? 'Changes requested' : pendingCategory ? 'Category pending' : 'Admin review pending'}</span></div>} />; })}
-          {tab === 'categories' && data.categories.filter((item: any) => includes(item.name, item.key, item.status, item.requestedBy?.name)).map((item: any) => <Row key={item.id} title={item.name} subtitle={`${item.key} · Requested by ${item.requestedBy?.name || 'zoon'}${item.description ? ` · ${item.description}` : ''}`} side={<div className="flex items-center gap-2">{item.status === 'PENDING' ? <><Action onClick={() => reviewCategory(item.id, 'APPROVED')} approve>Approve category</Action><Action onClick={() => reviewCategory(item.id, 'REJECTED')}>Reject</Action></> : <StatusBadge status={item.status} />}</div>} />)}
+          {tab === 'categories' && data.categories.filter((item: any) => includes(item.name, item.key, item.status, item.requestedBy?.name)).map((item: any) => <Row key={item.id} title={item.name} subtitle={`${item.key} · Requested by ${item.requestedBy?.name || 'Zoon'}${item.description ? ` · ${item.description}` : ''}`} side={<div className="flex items-center gap-2">{item.status === 'PENDING' ? <><Action onClick={() => reviewCategory(item.id, 'APPROVED')} approve>Approve category</Action><Action onClick={() => reviewCategory(item.id, 'REJECTED')}>Reject</Action></> : <StatusBadge status={item.status} />}</div>} />)}
           {tab === 'complaints' && data.complaints.filter((item: any) => includes(item.subject, item.message, item.author?.name, item.status)).map((item: any) => <Row key={item.id} title={item.subject} subtitle={`${item.author?.name} (${item.author?.role}) · ${item.message}`} side={<select className="rounded-xl border border-[var(--border)] bg-[var(--panel)] px-3 py-2 text-xs text-[var(--text)]" value={item.status} onChange={event => runAction(() => adminAPI.updateComplaint(item.id, event.target.value))}>{['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED'].map(status => <option key={status}>{status}</option>)}</select>} />)}
           {tab === 'ratings' && data.ratings.filter((item: any) => includes(item.rater?.name, item.worker?.user?.name, item.comment, item.score)).map((item: any) => <Row key={item.id} title={`${'★'.repeat(item.score)}${'☆'.repeat(5 - item.score)}`} subtitle={`${item.rater?.name} rated ${item.worker?.user?.name}${item.comment ? ` · “${item.comment}”` : ''}`} side={<span className="text-xs text-[var(--muted)]">{formatDate(item.createdAt)}</span>} />)}
-          {tab === 'ratings' && (data.appRatings || []).filter((item: any) => includes(item.user?.name, item.comment, item.score)).map((item: any) => <Row key={`app-${item.id}`} title={`zoon app · ${'★'.repeat(item.score)}${'☆'.repeat(5 - item.score)}`} subtitle={`${item.user?.name}${item.comment ? ` · “${item.comment}”` : ''}`} side={<span className="text-xs text-[var(--muted)]">{formatDate(item.createdAt)}</span>} />)}
+          {tab === 'ratings' && (data.appRatings || []).filter((item: any) => includes(item.user?.name, item.comment, item.score)).map((item: any) => <Row key={`app-${item.id}`} title={`Zoon app · ${'★'.repeat(item.score)}${'☆'.repeat(5 - item.score)}`} subtitle={`${item.user?.name}${item.comment ? ` · “${item.comment}”` : ''}`} side={<span className="text-xs text-[var(--muted)]">{formatDate(item.createdAt)}</span>} />)}
           {!loading && ((tab === 'appointments' && !data.requests.some((item: any) => item.scheduledAt || item.bookingStage)) || (tab === 'orders' && data.requests.length === 0) || (tab === 'users' && data.users.filter((item: any) => item.role === 'USER').length === 0) || (tab === 'professionals' && data.workers.length === 0) || (tab === 'categories' && data.categories.length === 0) || (tab === 'complaints' && data.complaints.length === 0) || (tab === 'ratings' && data.ratings.length === 0 && data.appRatings.length === 0)) && <div className="hf-panel rounded-2xl p-12 text-center text-sm text-[var(--muted)]">Nothing here yet.</div>}
         </section>
       </div>

@@ -58,7 +58,7 @@ export default function LiveTrackingMap({ worker, customer, workerName = 'Your p
   const distance = useMemo(() => distanceKm(worker, customer), [worker, customer]);
 
   useEffect(() => {
-    const stylesheetId = 'zoon-leaflet-css';
+    const stylesheetId = 'Zoon-leaflet-css';
     if (!document.getElementById(stylesheetId)) {
       const link = document.createElement('link');
       link.id = stylesheetId;
@@ -67,14 +67,14 @@ export default function LiveTrackingMap({ worker, customer, workerName = 'Your p
       document.head.appendChild(link);
     }
     if (window.L) { setReady(true); return; }
-    const existing = document.getElementById('zoon-leaflet-js') as HTMLScriptElement | null;
+    const existing = document.getElementById('Zoon-leaflet-js') as HTMLScriptElement | null;
     const script = existing || document.createElement('script');
     const loaded = () => setReady(true);
     const failed = () => setMapError(true);
     script.addEventListener('load', loaded);
     script.addEventListener('error', failed);
     if (!existing) {
-      script.id = 'zoon-leaflet-js';
+      script.id = 'Zoon-leaflet-js';
       script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
       script.async = true;
       document.body.appendChild(script);

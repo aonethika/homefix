@@ -54,7 +54,7 @@ export default function WorkersPage() {
           Professionals
         </h1>
         <p className="text-xs sm:text-sm text-[var(--muted)] mb-5">
-          Browse public profiles of zoon-approved professionals. Identity-check badges appear only when automated checks passed; compare reviews and completed jobs before requesting service.
+          Browse public profiles of Zoon-approved professionals. Identity-check badges appear only when automated checks passed; compare reviews and completed jobs before requesting service.
         </p>
 
         <div className="flex gap-2 flex-wrap mb-5">

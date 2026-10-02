@@ -83,7 +83,7 @@ export default function ChatBox() {
   }, [user, token, dispatch]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: messages.length > 1 ? 'smooth' : 'auto' }); }, [messages, sending, chatState]);
-  useEffect(() => { const listener=(event:Event)=>{const detail=(event as CustomEvent).detail;if(detail?.requestId===currentRequest?.id && ['ACCEPTED','IN_PROGRESS'].includes(currentRequest?.status))setWorkerLocation(detail);}; window.addEventListener('zoon:worker-location',listener); return()=>window.removeEventListener('zoon:worker-location',listener); }, [currentRequest?.id, currentRequest?.status]);
+  useEffect(() => { const listener=(event:Event)=>{const detail=(event as CustomEvent).detail;if(detail?.requestId===currentRequest?.id && ['ACCEPTED','IN_PROGRESS'].includes(currentRequest?.status))setWorkerLocation(detail);}; window.addEventListener('Zoon:worker-location',listener); return()=>window.removeEventListener('Zoon:worker-location',listener); }, [currentRequest?.id, currentRequest?.status]);
   useEffect(() => { setWorkerLocation(null); }, [currentRequest?.id, currentRequest?.status]);
 
   const submitMessage = useCallback(async (raw: string, displayMessage?: string) => {
@@ -339,7 +339,7 @@ export default function ChatBox() {
             <textarea ref={inputRef} rows={1} value={input} onChange={e => setInput(e.target.value.slice(0, 600))} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitMessage(input); } }} placeholder="Describe what needs fixing…" className="max-h-28 min-h-10 flex-1 resize-none bg-transparent px-1 py-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--muted)]" aria-label="Message FixBot" />
             <button onClick={() => submitMessage(input)} disabled={!input.trim() || sending} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-400 text-[#090e1d] transition hover:bg-blue-300 disabled:cursor-not-allowed disabled:bg-[var(--soft)] disabled:text-[var(--muted)]" aria-label="Send message"><ArrowUp size={18} strokeWidth={2.5} /></button>
           </div>
-          <p className="mx-auto mt-2 max-w-3xl text-center text-[10px] text-[var(--muted)]">zoon uses your details only to arrange your service.</p></>}
+          <p className="mx-auto mt-2 max-w-3xl text-center text-[10px] text-[var(--muted)]">Zoon uses your details only to arrange your service.</p></>}
         </div>
       </section>
 

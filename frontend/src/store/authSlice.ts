@@ -45,7 +45,7 @@ const initialState: AuthState = {
 export const login = createAsyncThunk('auth/login', async (credentials: { email: string; password: string; portal?: string }, { rejectWithValue }) => {
   try {
     const { data } = await authAPI.login(credentials);
-    localStorage.setItem('zoon_login_portal', data.data.user.role);
+    localStorage.setItem('Zoon_login_portal', data.data.user.role);
     return data.data;
   } catch (err: any) {
     return rejectWithValue(getApiError(err, 'Login failed'));
@@ -55,7 +55,7 @@ export const login = createAsyncThunk('auth/login', async (credentials: { email:
 export const register = createAsyncThunk('auth/register', async (userData: any, { rejectWithValue }) => {
   try {
     const { data } = await authAPI.register(userData);
-    localStorage.setItem('zoon_login_portal', 'USER');
+    localStorage.setItem('Zoon_login_portal', 'USER');
     return data.data;
   } catch (err: any) {
     return rejectWithValue(getApiError(err, 'Registration failed'));
@@ -93,14 +93,14 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('zoon_token');
-        localStorage.removeItem('zoon_user');
+        localStorage.removeItem('Zoon_token');
+        localStorage.removeItem('Zoon_user');
         localStorage.removeItem('sessionId');
       }
     },
     clearError: (state) => { state.error = null; },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.user) { state.user = { ...state.user, ...action.payload }; localStorage.setItem('zoon_user', JSON.stringify(state.user)); }
+      if (state.user) { state.user = { ...state.user, ...action.payload }; localStorage.setItem('Zoon_user', JSON.stringify(state.user)); }
     },
   },
   extraReducers: (builder) => {
@@ -111,8 +111,8 @@ const authSlice = createSlice({
         s.user = a.payload.user;
         s.token = a.payload.token;
         if (typeof window !== 'undefined') {
-          localStorage.setItem('zoon_token', a.payload.token);
-          localStorage.setItem('zoon_user', JSON.stringify(a.payload.user));
+          localStorage.setItem('Zoon_token', a.payload.token);
+          localStorage.setItem('Zoon_user', JSON.stringify(a.payload.user));
         }
       })
       .addCase(login.rejected, (s, a) => { s.loading = false; s.error = a.payload as string; })
@@ -122,8 +122,8 @@ const authSlice = createSlice({
         s.user = a.payload.user;
         s.token = a.payload.token;
         if (typeof window !== 'undefined') {
-          localStorage.setItem('zoon_token', a.payload.token);
-          localStorage.setItem('zoon_user', JSON.stringify(a.payload.user));
+          localStorage.setItem('Zoon_token', a.payload.token);
+          localStorage.setItem('Zoon_user', JSON.stringify(a.payload.user));
         }
       })
       .addCase(register.rejected, (s, a) => { s.loading = false; s.error = a.payload as string; })
@@ -131,8 +131,8 @@ const authSlice = createSlice({
       .addCase(registerProfessional.fulfilled, (s, a) => {
         s.loading = false; s.user = a.payload.user; s.token = a.payload.token;
         if (typeof window !== 'undefined') {
-          localStorage.setItem('zoon_token', a.payload.token);
-          localStorage.setItem('zoon_user', JSON.stringify(a.payload.user));
+          localStorage.setItem('Zoon_token', a.payload.token);
+          localStorage.setItem('Zoon_user', JSON.stringify(a.payload.user));
         }
       })
       .addCase(registerProfessional.rejected, (s, a) => { s.loading = false; s.error = a.payload as string; })

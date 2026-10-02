@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Trusted professionals | zoon',
-  description: 'Browse verified zoon service professionals.',
+  title: 'Trusted professionals | Zoon',
+  description: 'Browse verified Zoon service professionals.',
 };
 
 export default function WorkersLayout({ children }: { children: React.ReactNode }) {

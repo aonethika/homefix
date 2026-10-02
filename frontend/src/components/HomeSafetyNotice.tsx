@@ -30,7 +30,7 @@ export default function HomeSafetyNotice({
           <p className="text-sm font-bold">Before your home visit</p>
           {checked && <button type="button" onClick={() => setExpanded(false)} className="mt-1 text-xs font-semibold text-[var(--brand)] underline">Hide details</button>}
           <p className="mt-1 text-xs leading-5">
-            zoon connects you with an independent professional; the professional is responsible for their
+            Zoon connects you with an independent professional; the professional is responsible for their
             conduct and work. We cannot guarantee work quality or conduct, and this notice does not limit any
             rights you have under applicable law.
           </p>
@@ -38,7 +38,7 @@ export default function HomeSafetyNotice({
             <li>Confirm the professional’s name and agree on the job scope and price in the app.</li>
             <li>Never share OTPs, passwords, UPI PINs, or bank login details.</li>
             <li>Keep children, pets, and valuables safe; do not proceed if you feel uncomfortable.</li>
-            <li>Report concerns through zoon support. For immediate danger in India, call 112.</li>
+            <li>Report concerns through Zoon support. For immediate danger in India, call 112.</li>
           </ul>
 
           {blockedMessage ? (

@@ -7,7 +7,7 @@ const api = axios.create({ baseURL: API_URL, timeout: 15000 });
 
 // Attach token
 api.interceptors.request.use((config) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('zoon_token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('Zoon_token') : null;
   const publicAuthRequest = ['/auth/login', '/auth/register', '/auth/professional-register', '/auth/forgot-password', '/auth/reset-password', '/uploads/presign'].some(path => config.url?.startsWith(path));
   if (token && !publicAuthRequest && !config.headers.Authorization) config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -18,16 +18,16 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401 && typeof window !== 'undefined' && err.config?.headers?.Authorization) {
-      const adminToken = localStorage.getItem('zoon_admin_token');
+      const adminToken = localStorage.getItem('Zoon_admin_token');
       const requestAuthorization = err.config?.headers?.Authorization;
       if (adminToken && requestAuthorization === `Bearer ${adminToken}`) {
-        localStorage.removeItem('zoon_admin_token');
-        localStorage.removeItem('zoon_admin_user');
+        localStorage.removeItem('Zoon_admin_token');
+        localStorage.removeItem('Zoon_admin_user');
         window.location.href = '/admin';
       } else {
-        localStorage.removeItem('zoon_token');
-        localStorage.removeItem('zoon_user');
-        const professional = window.location.pathname.startsWith('/worker') && !window.location.pathname.startsWith('/workers') || localStorage.getItem('zoon_login_portal') === 'WORKER';
+        localStorage.removeItem('Zoon_token');
+        localStorage.removeItem('Zoon_user');
+        const professional = window.location.pathname.startsWith('/worker') && !window.location.pathname.startsWith('/workers') || localStorage.getItem('Zoon_login_portal') === 'WORKER';
         const returnPath = /^\/(book|bookings)\/[a-zA-Z0-9-]+$/.test(window.location.pathname) ? `?next=${encodeURIComponent(window.location.pathname)}` : '';
         window.location.href = (professional ? '/professional-login' : '/login') + returnPath;
       }
@@ -41,7 +41,7 @@ api.interceptors.response.use(
 export default api;
 
 export function getApiError(error: any, fallback: string) {
-  if (!error?.response) return 'We could not reach zoon. Check your connection and try again.';
+  if (!error?.response) return 'We could not reach Zoon. Check your connection and try again.';
   if (error.response.status >= 500) return 'Something went wrong on our side. Please try again shortly.';
   const message = error.response?.data?.message;
   return typeof message === 'string' && !/prisma|sql|stack|ECONN|backend|database|AccessDenied|bucket|secret|socket|undefined/i.test(message) ? message : fallback;
@@ -131,6 +131,6 @@ export const adminAPI = {
 };
 
 function adminAuth() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('zoon_admin_token') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('Zoon_admin_token') : null;
   return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 }

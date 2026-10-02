@@ -33,7 +33,7 @@ export default function LoginPage() {
           <div className="mb-9 lg:hidden"><Brand href="/" /></div>
           <p className="text-xs font-bold uppercase tracking-[.18em] text-teal-600">Professional sign in</p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-[-.04em] text-[var(--text)]">Good to see you again.</h2>
-          <p className="mt-2 text-sm text-[var(--muted)]">Enter your zoon account details.</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">Enter your Zoon account details.</p>
 
           <form onSubmit={async event => { event.preventDefault(); const result = await dispatch(login({ ...form, portal: 'WORKER' })); if (login.fulfilled.match(result)) router.replace(result.payload.user.role === 'WORKER' ? (bookingReturn().startsWith('/bookings/') ? bookingReturn() : '/worker') : '/chat'); }} className="mt-7 space-y-4">
             <label className="block text-sm font-semibold text-[var(--text)]">Email address<input type="email" autoComplete="email" required value={form.email} onChange={event => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" className="hf-input mt-2" /></label>
@@ -41,7 +41,7 @@ export default function LoginPage() {
             {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm text-rose-700">{error}</div>}
             <button disabled={loading} className="hf-primary flex w-full items-center justify-center gap-2 px-5 py-3.5 disabled:cursor-wait disabled:opacity-60">{loading ? 'Signing in…' : 'Continue'}{!loading && <ArrowRight size={17} />}</button>
           </form>
-          <p className="mt-4 text-center text-xs text-[var(--muted)]">Managing zoon? <Link href="/admin" className="font-bold text-[var(--brand)]">Admin sign in</Link></p><p className="mt-6 text-center text-sm text-[var(--muted)]">New to zoon? <Link href="/professional-register" className="font-bold text-blue-600">Create an account</Link></p>
+          <p className="mt-4 text-center text-xs text-[var(--muted)]">Managing Zoon? <Link href="/admin" className="font-bold text-[var(--brand)]">Admin sign in</Link></p><p className="mt-6 text-center text-sm text-[var(--muted)]">New to Zoon? <Link href="/professional-register" className="font-bold text-blue-600">Create an account</Link></p>
           <Link href="/login" className="mt-5 block text-center text-sm font-bold text-blue-600">Homeowner sign in</Link><div className="mt-7 border-t border-[var(--border)] pt-6"><Link href="/professional-register" className="flex items-center justify-center gap-2 rounded-xl bg-[var(--soft)] px-3 py-2.5 text-xs font-bold text-[var(--text)]"><BriefcaseBusiness size={15}/>Join as a professional</Link></div>
         </div>
       </section>

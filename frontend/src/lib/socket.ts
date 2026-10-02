@@ -5,7 +5,7 @@ let socket: Socket | null = null;
 export function getSocket(token?: string): Socket {
   if (!socket || !socket.connected) {
     socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000', {
-      auth: { token: token || (typeof window !== 'undefined' ? localStorage.getItem('zoon_token') : '') },
+      auth: { token: token || (typeof window !== 'undefined' ? localStorage.getItem('Zoon_token') : '') },
       transports: ['websocket', 'polling'],
       autoConnect: true,
     });

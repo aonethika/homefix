@@ -35,7 +35,7 @@ export default function BookingPage({ params }: { params: { id: string } }) {
   const [mobilePanel, setMobilePanel] = useState<'conversation' | 'details'>('conversation');
   useEffect(() => {
     const wantsAdmin = new URLSearchParams(window.location.search).get('admin') === '1';
-    if (wantsAdmin && !localStorage.getItem('zoon_admin_token')) { router.replace('/admin'); return; }
+    if (wantsAdmin && !localStorage.getItem('Zoon_admin_token')) { router.replace('/admin'); return; }
     if (!wantsAdmin && !user) { router.replace(`/login?next=${encodeURIComponent(`/bookings/${params.id}`)}`); return; }
     setAdmin(wantsAdmin);
   }, [user, params.id, router]);

@@ -42,7 +42,7 @@ export default function RatingModal({ requestId, onSuccess, onClose }: Props) {
 
         <div className="p-4 sm:p-5 border-b border-[var(--border)] flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-[var(--text)] text-base sm:text-lg">{stage === 'worker' ? 'Rate your professional' : 'Rate the zoon app'}</h3>
+            <h3 className="font-bold text-[var(--text)] text-base sm:text-lg">{stage === 'worker' ? 'Rate your professional' : 'Rate the Zoon app'}</h3>
             <p className="text-[11px] text-[var(--muted)] mt-0.5">{stage === 'worker' ? 'How was the service?' : 'One last step—how was the overall experience?'}</p>
           </div>
           <button
