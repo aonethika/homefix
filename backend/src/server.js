@@ -16,7 +16,7 @@ httpServer.listen(PORT, () => {
   const timer = setInterval(remind, 60000);
   timer.unref();
   httpServer.on('close', () => clearInterval(timer));
-  logger.info(`🏠 zoon Backend running on port ${PORT}`);
+  logger.info(`🏠 Zoon Backend running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 

@@ -21,7 +21,7 @@ export class ReplyService {
     const greetings = [
       "Hi! I'm FixBot 🏠 — your smart home services assistant. What issue are you facing today?",
       "Hello! Need a home repair or service? Just describe the problem and I'll find the right professional for you! 🛠️",
-      "Welcome to zoon! Tell me about the issue at home and I'll connect you with the right expert. 🏠",
+      "Welcome to Zoon! Tell me about the issue at home and I'll connect you with the right expert. 🏠",
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }
@@ -69,7 +69,7 @@ export class ReplyService {
   }
 
   paymentCompleted(amount) {
-    return `🎊 Payment of **₹${amount.toFixed(2)}** received successfully! Thank you for using zoon.\n\nHow was your experience? Please take a moment to **rate your service professional** — your feedback helps us maintain quality! ⭐`;
+    return `🎊 Payment of **₹${amount.toFixed(2)}** received successfully! Thank you for using Zoon.\n\nHow was your experience? Please take a moment to **rate your service professional** — your feedback helps us maintain quality! ⭐`;
   }
 
   cancelled() {

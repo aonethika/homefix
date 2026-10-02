@@ -23,7 +23,7 @@ export class StorageService {
     this.db = db; this.client = client; this.signPost = signPost; this.signGet = signGet; this.env = env;
   }
   get bucket() {
-    if (!this.env.S3_BUCKET) throw fail('Private uploads are not configured. Please contact zoon support.', 503);
+    if (!this.env.S3_BUCKET) throw fail('Private uploads are not configured. Please contact Zoon support.', 503);
     return this.env.S3_BUCKET;
   }
   get s3() {

@@ -113,7 +113,7 @@ export const reviewCategory = async (req, res, next) => {
     const status = String(req.body.status || '').toUpperCase();
     if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ success: false, message: 'Invalid decision' });
     const category = await prisma.serviceCategory.update({ where: { id: req.params.id }, data: { status }, include: { requestedBy: true } });
-    if (category.requestedById) await sendNotification(category.requestedById, `Category ${status.toLowerCase()}`, `${category.name} was ${status.toLowerCase()} by zoon.`, status, { categoryId: category.id });
+    if (category.requestedById) await sendNotification(category.requestedById, `Category ${status.toLowerCase()}`, `${category.name} was ${status.toLowerCase()} by Zoon.`, status, { categoryId: category.id });
     res.json({ success: true, data: category });
   } catch (error) { next(error); }
 };

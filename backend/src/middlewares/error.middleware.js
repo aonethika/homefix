@@ -19,7 +19,7 @@ export const errorHandler = (err, req, res, next) => {
       return res.status(404).json({ success: false, message: 'Record not found' });
     }
     if (err.code === 'P2021' || err.code === 'P2022') {
-      return res.status(503).json({ success: false, message: 'zoon is temporarily unavailable. Please try again shortly.' });
+      return res.status(503).json({ success: false, message: 'Zoon is temporarily unavailable. Please try again shortly.' });
     }
   }
 

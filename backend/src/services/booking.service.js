@@ -57,7 +57,7 @@ export class BookingService {
         const conflict = await tx.serviceRequest.findFirst({ where: { id: { not: id }, workerId: r.workerId, status: { notIn: closed }, scheduledAt: { gt: new Date(+date - 3600000), lt: new Date(+date + 3600000) } } });
         if (conflict) fail('That time is reserved. Please choose a time at least one hour apart.');
         data = { scheduledAt: date, bookingStage: 'SCHEDULED', expiresAt: null };
-        message = 'Your appointment is reserved. Open the appointment to see the time in your timezone. zoon will remind both of you before it starts.';
+        message = 'Your appointment is reserved. Open the appointment to see the time in your timezone. Zoon will remind both of you before it starts.';
       } else if (action === 'cancel') {
         if (!['ASSIGNED', 'ACCEPTED'].includes(r.status)) fail('Work has already started. Please contact support to resolve this booking.');
         const reason = typeof payload.reason === 'string' ? payload.reason.trim().slice(0, 500) : '';

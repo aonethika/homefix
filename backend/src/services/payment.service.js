@@ -29,7 +29,7 @@ export class PaymentService {
     const order = await razorpay.orders.create({
       amount: amountPaise,
       currency: 'INR',
-      receipt: `zoon_${requestId.substring(0, 16)}`,
+      receipt: `Zoon_${requestId.substring(0, 16)}`,
       notes: { requestId, userId },
     });
 

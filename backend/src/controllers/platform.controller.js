@@ -41,7 +41,7 @@ export const submitAppRating = async (req, res, next) => {
     const score = Number(req.body.score);
     if (!Number.isInteger(score) || score < 1 || score > 5) return res.status(400).json({ success: false, message: 'Choose a rating from 1 to 5' });
     const rating = await prisma.appRating.create({ data: { userId: req.user.id, score, comment: req.body.comment?.trim() || null } });
-    await notifyAdmins('New app feedback', `${req.user.name} rated zoon ${score}/5.`, 'INFO', { appRatingId: rating.id });
+    await notifyAdmins('New app feedback', `${req.user.name} rated Zoon ${score}/5.`, 'INFO', { appRatingId: rating.id });
     res.status(201).json({ success: true, data: rating });
   } catch (error) { next(error); }
 };
