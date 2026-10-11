@@ -1,315 +1,132 @@
-# 🏠 HomeFix — AI-Powered Smart Home Services Platform
+# Zoon
 
-A full-stack, chat-first home services platform connecting homeowners with nearby service professionals (plumber, electrician, AC technician, carpenter). Users describe issues in natural language, the AI detects intent, matches workers based on skill + location, and manages the full service lifecycle.
+## Home repairs, handled in one conversation.
 
----
+Zoon connects homeowners with trusted local professionals for everyday repairs. Describe what went wrong in natural language, share your location, and follow the job from the first message to payment and review.
 
-## ✨ Features
+Built for homeowners and service professionals in Kerala.
 
-| Feature | Details |
-|---|---|
-| 💬 Chat-First UI | Describe problems in plain language, AI understands |
-| 🤖 Intent Detection | Auto-detects service type, urgency, and cancel/confirm intent |
-| 📍 Location Matching | Haversine distance scoring for nearest worker |
-| 🔄 Real-time Updates | Socket.io for instant status changes |
-| 💰 Razorpay Payments | Secure UPI/card/netbanking payments |
-| ⭐ Rating System | Post-service worker ratings |
-| 👥 Role-Based Access | User / Worker / Admin separation |
-| 🔐 JWT Auth | Secure token-based authentication |
+## What you can do with Zoon
 
----
+### For homeowners
 
-## 🗂️ Project Structure
+- Explain a repair in your own words through FixBot.
+- Find nearby professionals for plumbing, electrical work, AC service, carpentry, and more.
+- Share photos, voice notes, and your service location.
+- Track requests, appointments, messages, pricing, and payments in one place.
+- Pay securely and rate the completed service.
 
-```
-homefix/
-├── backend/          # Node.js + Express + Prisma
-│   ├── prisma/       # Schema & migrations
-│   └── src/
-│       ├── controllers/
-│       ├── services/
-│       ├── routes/
-│       ├── middlewares/
-│       ├── socket/
-│       ├── lib/
-│       └── utils/
-└── frontend/         # Next.js 14 + TypeScript + Tailwind
-    └── src/
-        ├── app/      # App Router pages
-        ├── components/
-        ├── store/    # Redux slices
-        ├── services/ # API clients
-        ├── hooks/
-        └── utils/
-```
+### For professionals
 
----
+- Create a professional profile and submit verification documents.
+- Receive nearby service requests that match your skills.
+- Accept or decline jobs, schedule visits, and message customers.
+- Update job progress, share a final price, and track earnings.
 
-## 🚀 Quick Start
+## How it works
 
-### Prerequisites
+1. Tell Zoon what needs fixing.
+2. Confirm your service location and details.
+3. Choose a matched professional.
+4. Follow the visit and conversation in real time.
+5. Approve the price, pay securely, and leave a review.
 
-- Node.js 18+
-- PostgreSQL 14+
-- A [Razorpay](https://razorpay.com) test account
+## Product highlights
 
----
+- Chat-first service requests
+- Location-aware professional matching
+- Real-time updates with Socket.IO
+- Appointment scheduling and live visit tracking
+- Secure Razorpay payments
+- Photo and voice-note attachments
+- Professional verification workflow
+- Separate homeowner, professional, and admin workspaces
+- Light and dark themes with a shared Zoon brand system
 
-### 1. Clone & Install
+## Run Zoon locally
+
+### Requirements
+
+- Node.js 18 or newer
+- PostgreSQL 14 or newer
+- A Razorpay test account for payment testing
+
+### Install dependencies
+
+From the repository root:
 
 ```bash
-git clone <your-repo>
-cd homefix
-
-# Install backend deps
-cd backend
-npm install
-
-# Install frontend deps
-cd ../frontend
-npm install
+npm run install:all
 ```
 
----
+### Configure the backend
 
-### 2. Configure Backend
+Create `backend/.env` with values for your local environment:
 
-```bash
-cd backend
-cp .env.example .env
-```
-
-Edit `backend/.env`:
 ```env
-DATABASE_URL="postgresql://YOUR_USER:YOUR_PASS@localhost:5432/homefix"
-JWT_SECRET="change-this-to-something-long-and-random"
-RAZORPAY_KEY_ID="rzp_test_xxxxxxxxxxxx"
-RAZORPAY_KEY_SECRET="your_razorpay_key_secret"
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/zoon"
+JWT_SECRET="replace-with-a-long-random-secret"
 PORT=5000
 CLIENT_URL="http://localhost:3000"
+RAZORPAY_KEY_ID="rzp_test_your_key"
+RAZORPAY_KEY_SECRET="your_razorpay_secret"
 ```
 
----
+Optional integrations such as AWS storage, identity checks, email, and AI responses can be configured through the backend service environment variables when those features are enabled.
 
-### 3. Setup Database
+### Configure the frontend
 
-```bash
-cd backend
+Create `frontend/.env.local`:
 
-# Generate Prisma client
-npx prisma generate
-
-# Push schema to database
-npx prisma db push
-
-# Seed demo data
-node src/prisma/seed.js
-```
-
----
-
-### 4. Configure Frontend
-
-```bash
-cd frontend
-cp .env.local.example .env.local
-```
-
-Edit `frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
-NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxxxxxx
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_your_key
 ```
 
----
+### Prepare the database
 
-### 5. Run Development Servers
-
-**Terminal 1 — Backend:**
 ```bash
-cd backend
-npm run dev
+npm run db:generate
+npm run db:push
+npm run db:seed
 ```
 
-**Terminal 2 — Frontend:**
+### Start the app
+
+Use two terminals:
+
 ```bash
-cd frontend
-npm run dev
+# Terminal 1
+npm run dev:backend
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
-
----
-
-## 🔑 Demo Accounts (after seeding)
-
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@homefix.com | password123 |
-| User | user@homefix.com | password123 |
-| Plumber | plumber@homefix.com | password123 |
-| Electrician | electric@homefix.com | password123 |
-| AC Tech | ac@homefix.com | password123 |
-| Carpenter | carpenter@homefix.com | password123 |
-
----
-
-## 💬 Chat Flow — How It Works
-
-```
-User: "My bathroom pipe is leaking badly"
-Bot:  Detects → PLUMBER, HIGH urgency
-Bot:  "Sounds like you need a plumber! Share your location."
-
-User: "Kozhikode, Kerala" (or shares GPS coords)
-Bot:  Creates ServiceRequest → finds nearest available plumber
-Bot:  "Found Suresh (~1.2 km away)! Notifying him..."
-
-[Worker gets notified via Socket.io]
-Worker: Accepts the job
-Bot → User: "Suresh accepted! He's on his way."
-
-Worker: Marks IN_PROGRESS, then COMPLETED
-Worker: Sets price ₹500
-Bot → User: "Suresh has proposed ₹500. Approve? (Yes/No)"
-
-User: "Yes"
-Bot:  Creates Razorpay order → Shows Pay button
-User: Completes payment via Razorpay popup
-Bot:  "Payment confirmed! Please rate your experience."
-
-User: Submits 5-star rating → Request COMPLETED
-```
-
----
-
-## 🌐 API Reference
-
-### Auth
-```
-POST /api/auth/register    — Register user/worker
-POST /api/auth/login       — Login
-GET  /api/auth/me          — Get profile
-```
-
-### Chat (User only)
-```
-POST /api/chat/message          — Send message (main engine)
-POST /api/chat/session          — Create new session
-GET  /api/chat/sessions         — List sessions
-GET  /api/chat/session/:id      — Get session + messages
-```
-
-### Requests
-```
-GET  /api/requests/my           — User's requests
-GET  /api/requests/:id          — Get single request
-POST /api/requests/:id/cancel   — Cancel request
-GET  /api/requests              — All (Admin only)
-```
-
-### Workers
-```
-GET  /api/workers               — List workers (public)
-POST /api/workers/availability  — Toggle availability
-GET  /api/workers/requests      — Worker's jobs
-POST /api/workers/requests/:id/accept    — Accept job
-POST /api/workers/requests/:id/reject    — Reject job
-PATCH /api/workers/requests/:id/status  — Update status
-POST /api/workers/requests/:id/price    — Set price
-```
-
-### Payments
-```
-POST /api/payments/create-order — Create Razorpay order
-POST /api/payments/verify       — Verify & confirm payment
-GET  /api/payments/:requestId   — Get payment details
-```
-
-### Ratings
-```
-POST /api/ratings               — Submit rating (1–5)
-GET  /api/ratings/worker/:id    — Worker's ratings
-```
-
----
-
-## 🔌 Socket.io Events
-
-| Event | Direction | Payload |
-|---|---|---|
-| `request:assigned` | Server → Worker | `{ requestId, serviceType, description }` |
-| `request:accepted` | Server → User | `{ requestId, workerName }` |
-| `request:rejected` | Server → User | `{ requestId }` |
-| `request:status` | Server → User | `{ requestId, status }` |
-| `request:price-set` | Server → User | `{ requestId, price, workerName }` |
-| `payment:completed` | Server → Both | `{ requestId, amount }` |
-| `worker:location` | Worker → Server | `{ lat, lon }` |
-
----
-
-## 🔧 Environment Variables
-
-### Backend
-| Variable | Description |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_SECRET` | Secret for JWT signing |
-| `JWT_EXPIRES_IN` | Token expiry (default: `7d`) |
-| `RAZORPAY_KEY_ID` | Razorpay API key |
-| `RAZORPAY_KEY_SECRET` | Razorpay secret key |
-| `PORT` | Server port (default: 5000) |
-| `CLIENT_URL` | Frontend URL for CORS |
-
-### Frontend
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_API_URL` | Backend API URL |
-| `NEXT_PUBLIC_SOCKET_URL` | Socket.io server URL |
-| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Razorpay public key |
-
----
-
-## 🚢 Production Deployment
-
-### Backend (Railway / Render / EC2)
 ```bash
-npm run build  # Not needed for JS
-npm start
+# Terminal 2
+npm run dev:frontend
 ```
 
-Set `NODE_ENV=production` and all env vars.
+Then open [http://localhost:3000](http://localhost:3000).
 
-### Frontend (Vercel)
-```bash
-npm run build
+## Project layout
+
+```text
+Zoon/
+├── backend/     Express API, Prisma schema, services, payments, and sockets
+├── frontend/    Next.js application, pages, components, and client state
+├── .github/     Deployment workflow configuration
+├── package.json Shared local development commands
+└── README.md    Project documentation
 ```
 
-Push to GitHub → connect to Vercel → add env vars → deploy.
+## Production notes
 
-### Database
-- Use [Neon](https://neon.tech) or [Supabase](https://supabase.com) for managed PostgreSQL
-- Run `npx prisma migrate deploy` for production migrations
+- Set strong production secrets for JWT, database access, payments, storage, and external services.
+- Run Prisma migrations with `npm run db:deploy` from `backend`.
+- Deploy the frontend to a Next.js-compatible host such as Vercel.
+- Set `CLIENT_URL` and the frontend API/socket URLs to the deployed domains.
+- Never commit `.env`, `.env.local`, payment secrets, or private identity documents.
 
----
+## License
 
-## 📐 Key Design Decisions
-
-1. **Chat is source of truth for UX** — all user interactions happen through the chatbot
-2. **ServiceRequest is source of truth for data** — backend always verifies state
-3. **Worker controls price** — user can only approve or decline
-4. **Payment is a separate entity** — never embedded in requests
-5. **Haversine matching** — distance-weighted scoring (50% distance + 30% rating + 20% workload)
-
----
-
-## 🛠️ Tech Stack
-
-**Backend:** Node.js · Express.js · Prisma ORM · PostgreSQL · Socket.io · JWT · Razorpay · Winston
-
-**Frontend:** Next.js 14 (App Router) · TypeScript · TailwindCSS · Redux Toolkit · Socket.io-client · Framer Motion ready
-
----
-
-Built with ❤️ for Kerala homeowners 🏠
+This project is currently maintained as a private application codebase.
