@@ -75,6 +75,7 @@ textarea.hf-input { height:auto; min-height:6rem; resize:vertical; }
 .portal-user .text-blue-600, .portal-user .text-blue-500, .portal-professional .text-blue-600, .portal-professional .text-blue-500 { color:#D97757; }
 .portal-user .bg-emerald-100, .portal-professional .bg-emerald-100 { background-color:#fff0eb; color:#b85f43; }
 .portal-user .text-emerald-700, .portal-professional .text-emerald-700 { color:#b85f43; }
+.portal-user .animate-spin, .portal-professional .animate-spin { color:#D97757; }
 .support-portal-modal { --page:#ffffff; --panel:#ffffff; --soft:#fff5f1; --border:#f0d3c8; --text:#3b2722; --muted:#795f56; --brand:#D97757; background:#ffffff !important; color:#3b2722 !important; }
 .support-portal-modal .hf-input { background:#ffffff; color:#3b2722; }
 html[data-theme='dark'] .support-portal-modal { --page:#000000; --panel:#0b0b0b; --soft:#171717; --border:#2b2b2b; --text:#ffffff; --muted:#a3a3a3; background:#0b0b0b !important; color:#ffffff !important; }
@@ -93,3 +94,7 @@ html[data-theme='light'] .portal-user .hf-panel, html[data-theme='light'] .porta
 html[data-theme='dark'] .portal-user, html[data-theme='dark'] .portal-professional { --page:#000000; --panel:#0b0b0b; --soft:#171717; --border:#2b2b2b; --text:#ffffff; --muted:#a3a3a3; }
 html[data-theme='dark'] .portal-user, html[data-theme='dark'] .portal-professional { color-scheme:dark; background:#000000; }
 html[data-theme='dark'] body { background:var(--surface); color:var(--text-primary); }
+html[data-theme='light'], html[data-theme='light'] body { background:#ffffff; }
+html[data-theme='dark'], html[data-theme='dark'] body { background:#000000; }
+html:has(.portal-user), html:has(.portal-professional), body:has(.portal-user), body:has(.portal-professional) { background:#ffffff !important; }
+html[data-theme='dark']:has(.portal-user), html[data-theme='dark']:has(.portal-professional), html[data-theme='dark'] body:has(.portal-user), html[data-theme='dark'] body:has(.portal-professional) { background:#000000 !important; }
