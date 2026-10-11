@@ -3,6 +3,7 @@ node_modules
 
 # next build
 .next
+.next-verify
 out
 dist
 
@@ -27,3 +28,11 @@ prisma/dev.db
 
 # optional
 coverage
+
+# Generated cache backups
+.next-backup-*
+
+.next-dev
+
+# TypeScript incremental build cache
+*.tsbuildinfo
