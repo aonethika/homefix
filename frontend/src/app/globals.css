@@ -44,3 +44,52 @@ h1,h2,h3,h4,h5,h6,.font-display { font-family:"Segoe UI Semibold","Trebuchet MS"
 .hf-safety { background:var(--panel); color:var(--text); border-color:var(--border); border-left:3px solid var(--warning); }
 .hf-safety ul, .hf-safety p:not(:first-child) { color:var(--muted); }
 textarea.hf-input { height:auto; min-height:6rem; resize:vertical; }
+
+/* Public portals use their own visual language; the admin portal intentionally
+   keeps the original tokens above so its existing workspace stays unchanged. */
+.portal-user {
+  --page:#ffffff; --panel:#ffffff; --soft:#fff5f1; --border:#f0d3c8;
+  --text:#3b2722; --muted:#795f56; --brand:#D97757; --brand-dark:#b85f43;
+  background:#ffffff;
+}
+.portal-professional {
+  --page:#ffffff; --panel:#ffffff; --soft:#fff5f1; --border:#f0d3c8;
+  --text:#3b2722; --muted:#795f56; --brand:#D97757; --brand-dark:#b85f43;
+  background:#ffffff;
+}
+.portal-user .hf-primary, .portal-professional .hf-primary { background:linear-gradient(135deg,#D97757,#c45f42); box-shadow:0 12px 32px rgba(217,119,87,.24); }
+.portal-user section.bg-gradient-to-br, .portal-professional section.bg-gradient-to-br, .portal-user aside.bg-gradient-to-br, .portal-professional aside.bg-gradient-to-br { background-image:linear-gradient(135deg,#9f4933,#D97757,#e89a78) !important; }
+.portal-user .bg-blue-400, .portal-user .bg-blue-600, .portal-professional .bg-blue-400, .portal-professional .bg-blue-600 { background-color:#D97757; }
+.portal-user .bg-blue-300, .portal-user .bg-blue-500, .portal-professional .bg-blue-300, .portal-professional .bg-blue-500 { background-color:#D97757; }
+.portal-user .bg-teal-500, .portal-user .bg-teal-600, .portal-professional .bg-teal-500, .portal-professional .bg-teal-600 { background-color:#D97757; }
+.portal-user .hover\:bg-blue-300:hover, .portal-user .hover\:bg-blue-500:hover, .portal-user .hover\:bg-blue-700:hover, .portal-professional .hover\:bg-blue-300:hover, .portal-professional .hover\:bg-blue-500:hover, .portal-professional .hover\:bg-blue-700:hover { background-color:#bf6043; }
+.portal-user .hover\:text-blue-600:hover, .portal-user .hover\:text-blue-700:hover, .portal-professional .hover\:text-blue-600:hover, .portal-professional .hover\:text-blue-700:hover { color:#b85f43; }
+.portal-user .hover\:border-blue-400:hover, .portal-user .hover\:border-blue-500:hover, .portal-professional .hover\:border-blue-400:hover, .portal-professional .hover\:border-blue-500:hover { border-color:#D97757; }
+.portal-user .from-blue-600.to-teal-500, .portal-professional .from-blue-600.to-teal-500 { background:linear-gradient(135deg,#D97757,#c45f42); }
+.portal-user .from-blue-500.to-teal-400, .portal-professional .from-blue-500.to-teal-400 { background:linear-gradient(135deg,#D97757,#c45f42); }
+.portal-user .text-blue-700, .portal-user .text-blue-800, .portal-professional .text-blue-700, .portal-professional .text-blue-800 { color:#b85f43; }
+.portal-user .text-teal-600, .portal-user .text-teal-700, .portal-professional .text-teal-600, .portal-professional .text-teal-700 { color:#b85f43; }
+.portal-user .border-blue-400, .portal-user .border-blue-300, .portal-professional .border-blue-400, .portal-professional .border-blue-300 { border-color:rgba(217,119,87,.45); }
+.portal-user .focus\:border-blue-400:focus, .portal-professional .focus\:border-blue-400:focus { border-color:#D97757; }
+.portal-user .hf-input:focus, .portal-professional .hf-input:focus { border-color:#D97757; box-shadow:0 0 0 4px rgba(217,119,87,.16); }
+.portal-user .text-blue-600, .portal-user .text-blue-500, .portal-professional .text-blue-600, .portal-professional .text-blue-500 { color:#D97757; }
+.portal-user .bg-emerald-100, .portal-professional .bg-emerald-100 { background-color:#fff0eb; color:#b85f43; }
+.portal-user .text-emerald-700, .portal-professional .text-emerald-700 { color:#b85f43; }
+.support-portal-modal { --page:#ffffff; --panel:#ffffff; --soft:#fff5f1; --border:#f0d3c8; --text:#3b2722; --muted:#795f56; --brand:#D97757; background:#ffffff !important; color:#3b2722 !important; }
+.support-portal-modal .hf-input { background:#ffffff; color:#3b2722; }
+html[data-theme='dark'] .support-portal-modal { --page:#000000; --panel:#0b0b0b; --soft:#171717; --border:#2b2b2b; --text:#ffffff; --muted:#a3a3a3; background:#0b0b0b !important; color:#ffffff !important; }
+html[data-theme='dark'] .support-portal-modal .hf-input { background:#0b0b0b; color:#ffffff; }
+.support-portal-modal .hf-primary { background:linear-gradient(135deg,#D97757,#c45f42); box-shadow:0 12px 32px rgba(217,119,87,.24); }
+.theme-toggle { border-color:#D97757; color:#D97757; background:#ffffff; }
+.theme-toggle:hover { background:#fff0eb; }
+html[data-theme='dark'] .theme-toggle { border-color:#D97757; color:#D97757; background:#0b0b0b; }
+html[data-theme='dark'] .theme-toggle:hover { background:#281814; }
+.portal-confirm { --panel:#ffffff; --border:#f0d3c8; --text:#3b2722; --muted:#795f56; background:#ffffff !important; }
+html[data-theme='dark'] .portal-confirm { --panel:#0b0b0b; --border:#2b2b2b; --text:#ffffff; --muted:#a3a3a3; background:#0b0b0b !important; }
+.chat-page { background:#000 !important; --page:#000; --panel:#0b0b0b; --soft:#171717; --border:#2b2b2b; --text:#fff; --muted:#a3a3a3; }
+.chat-page .from-blue-600.to-teal-500 { background:linear-gradient(135deg,#D97757,#c45f42); }
+html[data-theme='light'] .portal-user, html[data-theme='light'] .portal-professional { --page:#ffffff; --panel:#ffffff; --soft:#fff5f1; --border:#f0d3c8; --text:#3b2722; --muted:#795f56; color-scheme:light; background:#ffffff !important; }
+html[data-theme='light'] .portal-user .hf-panel, html[data-theme='light'] .portal-professional .hf-panel { background:#ffffff; }
+html[data-theme='dark'] .portal-user, html[data-theme='dark'] .portal-professional { --page:#000000; --panel:#0b0b0b; --soft:#171717; --border:#2b2b2b; --text:#ffffff; --muted:#a3a3a3; }
+html[data-theme='dark'] .portal-user, html[data-theme='dark'] .portal-professional { color-scheme:dark; background:#000000; }
+html[data-theme='dark'] body { background:var(--surface); color:var(--text-primary); }

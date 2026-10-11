@@ -27,7 +27,7 @@ export default function BookPage({ params }: { params: { workerId: string } }) {
     }).catch(e => setError(getApiError(e, 'Could not load this professional.'))).finally(() => setLoading(false));
   }, [params.workerId, user, router]);
   const services = worker?.services?.length ? worker.services.map((s: any) => s.category) : [{ key: worker?.serviceKey || worker?.serviceType, name: worker?.serviceKey || worker?.serviceType }];
-  return <main className="min-h-screen bg-[var(--page)] px-4 pb-12 pt-6 text-[var(--text)] sm:px-6"><div className="mx-auto max-w-5xl">
+  return <main className="portal-user min-h-screen bg-[var(--page)] px-4 pb-12 pt-6 text-[var(--text)] sm:px-6"><div className="mx-auto max-w-5xl">
     <nav className="flex min-h-10 items-center gap-6 pr-20 text-sm font-semibold text-[var(--muted)]"><Link href="/workers">Back to professionals</Link><Link href={user?.role === 'WORKER' ? '/worker' : '/dashboard'}>{user?.role === 'WORKER' ? 'Professional workspace' : 'My bookings'}</Link></nav>
     <header className="py-8"><p className="text-xs font-bold uppercase tracking-widest text-[var(--brand)]">Homeowner / Future booking</p><h1 className="mt-3 text-3xl font-bold tracking-tight">Plan your home visit.</h1><p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">Choose when you need help and tell your professional about the issue. They will confirm the time before your visit is booked.</p></header>
     {error && <p role="alert" className="mb-5 rounded-xl border border-rose-400/30 bg-rose-500/5 p-4 text-sm text-[var(--danger)]">{error}</p>}

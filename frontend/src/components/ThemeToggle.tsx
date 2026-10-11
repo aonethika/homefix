@@ -29,5 +29,5 @@ export default function ThemeToggle({ inline = false }: { inline?: boolean }) {
     try { localStorage.setItem('Zoon_theme', next ? 'dark' : 'light'); } catch { /* Keep the current page usable without storage. */ }
   };
   const label = `Switch to ${dark ? 'light' : 'dark'} theme`;
-  return <button type="button" disabled={!ready} onClick={toggle} className={`${inline ? "relative" : "fixed bottom-5 right-5 z-[90]"} grid h-11 w-11 place-items-center rounded-2xl border border-[var(--border)] bg-[var(--panel)] text-[var(--text)] shadow-xl transition hover:-translate-y-0.5 disabled:opacity-50`} aria-label={label} title={label}>{dark ? <Sun size={18} /> : <Moon size={18} />}</button>;
+  return <button type="button" disabled={!ready} onClick={toggle} className={`${inline ? "relative" : "fixed bottom-5 right-5 z-[90]"} theme-toggle grid h-11 w-11 place-items-center rounded-2xl border bg-[var(--panel)] text-[var(--text)] shadow-xl transition hover:-translate-y-0.5 disabled:opacity-50`} aria-label={label} title={label}>{dark ? <Sun size={18} /> : <Moon size={18} />}</button>;
 }

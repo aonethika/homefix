@@ -31,5 +31,5 @@ export default function LogoutButton({ className = '', onConfirmed }: { classNam
     } catch (error) { setError(getApiError(error, 'Could not stop the active search. Please try again.')); }
     finally { setBusy(false); }
   };
-  return <><button type="button" onClick={() => { setError(''); setOpen(true); }} className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--soft)] ${className}`}><LogOut size={17} />Log out</button>{open && <ConfirmDialog title="Are you sure you want to log out?" confirmLabel="Log out" busy={busy} error={error} onCancel={() => setOpen(false)} onConfirm={confirm}><p>Any active professional search will be stopped before you leave.</p></ConfirmDialog>}</>;
+  return <><button type="button" onClick={() => { setError(''); setOpen(true); }} className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--soft)] ${className}`}><LogOut size={17} />Log out</button>{open && <ConfirmDialog accent={user?.role === 'ADMIN' ? 'default' : 'brand'} title="Are you sure you want to log out?" confirmLabel="Log out" busy={busy} error={error} onCancel={() => setOpen(false)} onConfirm={confirm}><p>Any active professional search will be stopped before you leave.</p></ConfirmDialog>}</>;
 }

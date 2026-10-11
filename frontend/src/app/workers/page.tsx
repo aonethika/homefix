@@ -35,7 +35,7 @@ export default function WorkersPage() {
   }, [filter]);
 
   return (
-    <div className="hf-page min-h-screen">
+    <div className="hf-page portal-user min-h-screen">
 
       <nav style={{ paddingRight: '5.5rem' }} className="flex-wrap gap-3 border-b border-[var(--border)] px-4 py-4 flex items-center justify-between">
         <Brand />

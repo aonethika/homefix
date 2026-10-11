@@ -47,7 +47,7 @@ export default function WorkerWorkspace({ children }: { children: React.ReactNod
   const tracking = user?.role === 'WORKER' && workerRequests.some(r => r.workerId === user.workerProfile?.id && ['ACCEPTED', 'IN_PROGRESS'].includes(r.status) && r.bookingStage !== 'READY' && (!r.scheduledAt || new Date(r.scheduledAt).getTime() <= now + 3600000));
   const { position, error: locationError } = useLivePosition(tracking);
   if (!user || user.role !== 'WORKER') return <div role="status" className="grid min-h-screen place-items-center text-sm text-[var(--muted)]">Opening professional workspace...</div>;
-  return <Context.Provider value={{ user, requests: workerRequests, loading, error, stats, position, locationError, refresh }}><div className="min-h-screen bg-[var(--page)] text-[var(--text)]">
+  return <Context.Provider value={{ user, requests: workerRequests, loading, error, stats, position, locationError, refresh }}><div className="portal-professional min-h-screen bg-[var(--page)] text-[var(--text)]">
     {menu && <button aria-label="Close navigation" onClick={() => setMenu(false)} className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden" />}
     <aside aria-label="Professional navigation" className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[var(--border)] bg-[var(--panel)] p-4 transition-transform lg:translate-x-0 ${menu ? 'translate-x-0' : '-translate-x-full'}`}>
       <div className="mb-8 flex min-h-10 items-center justify-between"><Brand href="/worker" /><button aria-label="Close navigation" onClick={() => setMenu(false)} className="grid h-11 w-11 place-items-center lg:hidden"><X size={20} /></button></div>

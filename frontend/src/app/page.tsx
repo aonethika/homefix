@@ -18,7 +18,7 @@ export default function HomePage() {
   const primaryHref = user ? (user.role === 'WORKER' ? '/worker' : user.role === 'ADMIN' ? '/' : '/chat') : '/login';
 
   return (
-    <div className="app-shell">
+    <div className="app-shell portal-user">
       <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--panel)]/80 backdrop-blur-xl">
         <nav className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 sm:px-8">
           <Brand />

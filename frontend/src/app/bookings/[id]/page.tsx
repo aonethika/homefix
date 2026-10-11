@@ -56,7 +56,7 @@ export default function BookingPage({ params }: { params: { id: string } }) {
     : request?.bookingStage === 'SCHEDULED' ? 'Your visit is confirmed. Use this conversation to prepare for the appointment.'
     : 'Keep your job updates and agreements together here.';
 
-  return <main className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--page)] text-[var(--text)]">
+  return <main className={`${admin ? '' : user?.role === 'WORKER' ? 'portal-professional' : 'portal-user'} flex h-[100dvh] flex-col overflow-hidden bg-[var(--page)] text-[var(--text)]`}>
     <nav className="relative z-30 flex min-h-[60px] shrink-0 items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--panel)] px-4 py-3 sm:px-6">
       <Link href={admin ? '/admin' : user?.role === 'WORKER' ? '/worker' : '/dashboard'} className="inline-flex min-h-10 items-center gap-2 rounded-xl text-sm font-semibold text-[var(--muted)] hover:text-[var(--brand)]"><ArrowLeft size={18} />{admin ? 'Admin appointments' : user?.role === 'WORKER' ? 'Professional workspace' : 'My bookings'}</Link>
       <WorkspaceTools notifications={!admin} support={!admin} />

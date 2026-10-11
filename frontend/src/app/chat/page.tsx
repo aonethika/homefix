@@ -25,7 +25,7 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="flex h-[100dvh] flex-col overflow-hidden bg-[var(--page)]">
+    <main className="portal-user chat-page flex h-[100dvh] flex-col overflow-hidden bg-[var(--page)]">
       <header className="z-20 flex min-h-[60px] shrink-0 items-center justify-between gap-2 py-2 border-b border-[var(--border)] bg-[var(--panel)] px-4 backdrop-blur-xl sm:px-6">
         <div className="[&_a>span:last-child]:hidden sm:[&_a>span:last-child]:inline"><Brand href="/" /></div>
         <div className="flex items-center gap-1.5">
